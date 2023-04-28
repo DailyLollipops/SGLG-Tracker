@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/output.css">
+    <title>Home</title>
+</head>
+<body>
+    <nav class="relative w-screen">
+        <div class="flex items-center basis-1/4 justify-between h-16">
+            <div class="p-2 h-14 ml-16">
+                <img src="../images/SGLG.png" alt="" class="h-14">
+            </div>
+            <div class="hidden md:flex basis-1/2 justify-end space-x-8">
+                <a href="" class="text-yankeesBlue font-bold">About</a>
+                <a href="" class="text-yankeesBlue font-bold">FAQs</a>
+            </div>
+            <form>   
+                <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+                <div class="relative">
+                    <input type="search" id="default-search" class="block w-48 md:w-64 h-9 my-2 mx-6 p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Something..." required>
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none mx-6">
+                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+            </form>            
+            <a href="" class="hidden md:block mr-6 px-8 py-2 py-auto text-white text-center font-bold bg-silverLakeBlue rounded-full baseline items-center">Dashboard</a>
+            <button id="menu-btn" class="block hamburger md:hidden focus:outline-none">
+                <span class="hamburger-top"></span>
+                <span class="hamburger-middle"></span>
+                <span class="hamburger-bottom"></span>
+            </button>
+        </div>
+        <div class="md:hidden">
+            <div id="menu" class="absolute flex-col items-center self-end hidden py-8 mt-10 space-y-6 font-bold bg-white sm:w-auto sm:self-center left-6 right-6 drop-shadow-md">
+                <a href="">About</a>
+                <a href="">FAQs</a>
+                <a href="">Login</a>
+            </div>
+        </div>
+    </nav>
+</body>
+<script>
+    const btn = document.getElementById('menu-btn')
+    const nav = document.getElementById('menu')
+
+    btn.addEventListener('click', () => {
+    btn.classList.toggle('open')
+    nav.classList.toggle('flex')
+    nav.classList.toggle('hidden')
+    })
+</script>
+</html>
