@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: form.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: form.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+class MainNode {
+    /**
+     * Create a MainNode Component
+     * 
+     * Wrapped on the main container
+     * 
+     * Serves as a main indicator for each governance area
+     * 
+     * @param {String} id Component ID 
+     * @param {String} question Node question, empty by default
+     * @param {boolean} hasAttachment Accepts attachment if `true`, otherwise false
+     * @param {String} type Node type - Possible values `('text','date','list')`
+     * @param {list} options Options list - Only add if type is set to `'list'`
+     */
+    constructor(id, question='', hasAttachment = false, type = 'text', options = []) {
+
+        // Create a div element
+        this.element = document.createElement('div');
+
+        // Set element's classes
+        this.element.classList.add('node','flex','flex-col','space-y-4');
+
+        // Create the main component
+        this.element.innerHTML = '&lt;div id="' + id +  '" class="flex flex-row space-x-4 items-center md:justify-center ml-12" data-options="' + options.length + '" data-subnodes="0">' +
+                    '&lt;div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2">' +
+                        '&lt;div class="flex flex-col p-2">' +
+                            '&lt;span role="textbox" id="' + id + '-indicator" class="question textarea grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable>&lt;/span>' + 
+                        '&lt;/div>' +
+                        '&lt;div class="flex flex-row space-x-4">' +
+                            '&lt;div class="flex flex-row basis-1/2 p-2">' +
+                                '&lt;input type="checkbox" id="' + id + '-has_attachment" name="' + id + '-has_attachment" class="attachment border-solid border-2 rounded-full border-zinc-400 p-2">' +
+                                '&lt;label for="' + id + '-has_attachment" class="my-auto m-2">Has attachments&lt;/label>' +
+                            '&lt;/div>' +
+                            '&lt;select name="' + id + '-type" id="' + id + '-type" class="type w-2/5 border-solid border-2 rounded-lg border-zinc-400 py-2" onchange="changeNode(\'' +id+ '\')">' +
+                                '&lt;option value="text" class="text-base">Text&lt;/option>' +
+                                '&lt;option value="date" class="text-base">Date&lt;/option>' +
+                                '&lt;option value="list" class="text-base">List&lt;/option>' +
+                            '&lt;/select>' +
+                        '&lt;/div>' +
+                    '&lt;/div>' +
+                    '&lt;div class="flex flex-col space-y-4 items-center w-1/6 md:w-1/12">' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;img src="../images/close.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="deleteMainNode(\'' +id+ '\')">' +
+                        '&lt;/div>' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;div class=" h-4 w-4 bg-black rotate-45 transform origin-bottom-left">&lt;/div>' +
+                        '&lt;/div>' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;div class=" h-4 w-4 bg-black -rotate-45 transform origin-top-left">&lt;/div>' +
+                        '&lt;/div>' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addSubnode(\'' +id+ '\')">' +
+                        '&lt;/div>' +
+                    '&lt;/div>' +
+                '&lt;/div>';
+
+        // Set question field's value
+        var questionField = this.element.querySelector('#'+ id + '-indicator');
+        questionField.innerText = question;
+
+        // Set the has_attachment checkbox value
+        var hasAttachmentField = this.element.querySelector('#'+ id + '-has_attachment');
+        hasAttachmentField.checked = hasAttachment;
+
+        // Set the node type
+        var typeSelectorField = this.element.querySelector('#'+ id + '-type');
+        typeSelectorField.value = type;
+
+        // Add options to node
+        if(options.length > 0){
+            var optionContainer = document.createElement('div');
+            optionContainer.setAttribute('id', id+'-options');
+            for(let i = 0; i &lt; options.length; i++){
+                var option = new Option(id, option = options[i], true, i);
+                optionContainer.appendChild(option);
+            }
+            var wrapper = this.element.children[0].children[0];
+            wrapper.appendChild(optionContainer);
+        }
+
+        return this.element;
+    }
+}
+
+class Subnode{
+    /**
+     * Create a Subnode Component
+     * 
+     * Wrapped on the a MainNode Component
+     * 
+     * Serves as a sub-indicator for each main indicator
+     * 
+     * @param {String} id Component ID 
+     * @param {int} level Subnode level
+     * @param {String} question Node question, empty by default
+     * @param {boolean} hasAttachment Accepts attachment if `true`, otherwise `false`
+     * @param {String} type Node type - Possible values `('text','date','list')`
+     * @param {list} options Options list - Only add if type is set to `'list'`
+     */
+    constructor(id, level, question='', hasAttachment = false, type = 'text', options = []){
+
+        // Create a div element
+        this.element = document.createElement('div');
+
+        // Set the element's classes
+        this.element.classList.add('node','flex','flex-col','space-y-4');
+
+        // Create the main component
+        this.element.innerHTML = '&lt;div id="' + id +  '" class="flex flex-row space-x-4 items-center md:justify-center ml-'+ level*12 +'" data-options="' + options.length + '" data-subnodes="0">' +
+                    '&lt;div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2">' +
+                        '&lt;div class="flex flex-col p-2">' +
+                            '&lt;span role="textbox" id="' + id + '-indicator" class="question textarea grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable>&lt;/span>' +        
+                        '&lt;/div>' +
+                        '&lt;div class="flex flex-row space-x-4">' +
+                            '&lt;div class="flex flex-row basis-1/2 p-2">' +
+                                '&lt;input type="checkbox" id="' + id + '-has_attachment" name="' + id + '-has_attachment" class="attachment border-solid border-2 rounded-full border-zinc-400 p-2">' +
+                                '&lt;label for="' + id + '-has_attachment" class="my-auto m-2">Has attachments&lt;/label>' +
+                            '&lt;/div>' +
+                            '&lt;select name="' + id + '-type" id="' + id + '-type" class="type w-2/5 border-solid border-2 rounded-lg border-zinc-400 py-2" onchange="changeNode(\'' +id+ '\')">' +
+                                '&lt;option value="text" class="text-base">Text&lt;/option>' +
+                                '&lt;option value="date" class="text-base">Date&lt;/option>' +
+                                '&lt;option value="list" class="text-base">List&lt;/option>' +
+                            '&lt;/select>' +
+                        '&lt;/div>' +
+                    '&lt;/div>' +
+                    '&lt;div class="flex flex-col space-y-4 items-center w-1/6 md:w-1/12">' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;img src="../images/close.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="deleteSubnode(\'' +id+ '\')">' +
+                        '&lt;/div>' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;div class=" h-4 w-4 bg-black rotate-45 transform origin-bottom-left">&lt;/div>' +
+                        '&lt;/div>' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;div class=" h-4 w-4 bg-black -rotate-45 transform origin-top-left">&lt;/div>' +
+                        '&lt;/div>' +
+                        '&lt;div class="w-8 overflow-hidden inline-block">' +
+                            '&lt;img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addSubnode(\'' +id+ '\')">' +
+                        '&lt;/div>' +
+                    '&lt;/div>' +
+                '&lt;/div>' ;
+
+        // Set question field's value
+        var questionField = this.element.querySelector('#'+ id.replaceAll('.','\\.') + '-indicator');
+        questionField.innerText = question;
+
+        // Set the has_attachment checkbox value
+        var hasAttachmentField = this.element.querySelector('#'+ id.replaceAll('.','\\.') + '-has_attachment');
+        hasAttachmentField.checked = hasAttachment;
+
+        // Set the node type
+        var typeSelectorField = this.element.querySelector('#'+ id.replaceAll('.','\\.') + '-type');
+        typeSelectorField.value = type;
+
+        // Add options to node
+        if(options.length > 0){
+            var optionContainer = document.createElement('div');
+            optionContainer.setAttribute('id', id+'-options');
+            for(let i = 0; i &lt; options.length; i++){
+                var option = new Option(id, option = options[i], true, i);
+                optionContainer.appendChild(option);
+            }
+            var wrapper = this.element.children[0].children[0];
+            wrapper.appendChild(optionContainer);
+        }
+
+        return this.element;
+    }
+}
+
+class Option{
+    /**
+     * Create an option component
+     * 
+     * Wrapped on the node's wrapper
+     * 
+     * @param {String} nodeID The parent's node ID
+     * @param {*} option Option field - blank by default
+     * @param {*} load Set to `true` if used to load existing form
+     * @param {*} index Required if load is set to `true`
+     */
+    constructor(nodeID, option = '', load = false, index = 0) {
+
+        // Get parent node element
+        var node = document.getElementById(nodeID);
+
+        // Initialize component for each cases
+        // Option 1: No delete and add button
+        // Option 2: No delete button but has add button
+        // Option 3: Has delete and add button
+        var block = '';
+        var option1 = `&lt;img src="../images/radio.png" alt="" class="h-4 ml-4 my-auto">&lt;input type="text" name="${nodeID}-option" id="${nodeID}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 md:ml-2 md:basis-3/4" placeholder="Option">`;
+        var option2 = `&lt;img src="../images/radio.png" alt="" class="h-4 ml-4 my-auto">&lt;input type="text" name="${nodeID}-option" id="${nodeID}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 md:ml-2 md:basis-3/4" placeholder="Option">&lt;img src="../images/plus.png" alt="" class="h-4 my-auto cursor-pointer" onclick="addOption(\'${nodeID}\')">`;
+        var option3 = `&lt;img src="../images/radio.png" alt="" class="h-4 ml-4 my-auto">&lt;input type="text" name="${nodeID}-option" id="${nodeID}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 md:ml-2 md:basis-3/4" placeholder="Option">&lt;img src="../images/plus.png" alt="" class="h-4 my-auto cursor-pointer" onclick="addOption(\'${nodeID}\')">&lt;img src="../images/close.png" alt="" class="h-4 my-auto cursor-pointer" onclick="deleteOption(this)">`;
+        
+        // If loading is set to true
+        // doesn't make use of current options of parent node
+        // Set component based on the provided index
+        if(load){
+            if(index == 0){
+                block =  option1;
+            }
+            else if(index == 1){
+                block = option2;
+            }
+            else{
+                block =  option3;
+            }    
+        }
+
+        // Otherwise, get current options of parent node
+        // then set component based on current options
+        else{
+            var nodeOptions = parseInt(node.getAttribute('data-options'));
+            if(nodeOptions == 0){
+                block =  option1;
+            }
+            else if(nodeOptions == 1){
+                block = option2;
+            }
+            else{
+                block =  option3;
+            }
+            node.setAttribute('data-options', parseInt(nodeOptions+1));
+        }
+
+        // Create wrapper element
+        this.element = document.createElement('div');
+        this.element.classList.add('flex','flex-row','space-x-4','items-center')
+        this.element.innerHTML = block;
+
+        return this.element;
+    }
+}
+
+/**
+ * Add a MainNode component to the container
+ * 
+ * *Note: Uses a div with an id of `container`*
+ * 
+ * @param {String} id Component ID 
+ * @param {String} question Node question, empty by default
+ * @param {boolean} hasAttachment Accepts attachment if `true`, otherwise false
+ * @param {String} type Node type - Possible values `('text','date','list')`
+ * @param {list} options Options list - Only add if type is set to `'list'`
+ * @todo Add additional parameter for specifying container ID
+ */
+function addMainNode(mainNodeID = '', question='', hasAttachment = false, type = 'text', options = []){
+
+    // Get main container element
+    var container = document.getElementById('container');
+
+    // Get container current nodes
+    var currentNode = parseInt(container.getAttribute('data-nodes'));
+
+    // If mainNodeID is empty, set mainNodeID based on
+    // current nodes of container
+    if(mainNodeID.length == 0){
+        mainNodeID = 'node_' + parseInt(currentNode+1);
+    }
+
+    // Create a MainNode component
+    var node = new MainNode(mainNodeID, question, hasAttachment, type, options);
+
+    // Increment the container's data-nodes attribute
+    container.setAttribute('data-nodes', parseInt(currentNode+1));
+
+    // Wrap the component to the container
+    container.appendChild(node);
+}
+
+/**
+ * Remove a MainNode component from the container
+ * 
+ * *Note: Uses a div with an id of `container`*
+ * 
+ * @param {String} mainNodeID Id of the MainNode component to be removed
+ * @todo Add additional parameter for specifying container ID
+ */
+function deleteMainNode(mainNodeID){
+
+    // Get the container element
+    var container = document.getElementById('container');
+
+    // Get the wrapper element
+    var mainNode = document.getElementById(mainNodeID).parentNode;
+
+    // If MainNode component exist
+    if(mainNode){
+
+        // Decrement the container's data-nodes attribute
+        var currentNode = parseInt(container.getAttribute('data-nodes'));
+        container.setAttribute('data-nodes', parseInt(currentNode-1))
+
+        // Remove the node to main container
+        container.removeChild(mainNode);
+    }
+    // If not, alert
+    else{
+        alert('MainNode component does not exist');
+    }
+}
+
+/**
+ * Add a Subnode component to a MainNode component
+ * 
+ * @param {String} parentID MainNode ID to attach to
+ * @param {String} subnodeID Component ID 
+ * @param {String} question Node question, empty by default
+ * @param {boolean} hasAttachment Accepts attachment if `true`, otherwise false
+ * @param {String} type Node type - Possible values `('text','date','list')`
+ * @param {list} options Options list - Only add if type is set to `'list'`
+ * @todo Add additional parameter for specifying container ID
+ */
+function addSubnode(parentID, subnodeID = '', question='', hasAttachment = false, type = 'text', options = []){
+    
+    // Get MainNode component element
+    var parent = document.getElementById(parentID);
+
+    // Get current data-subnodes of the MainNode component
+    var parentSubnodes = parseInt(parent.getAttribute('data-subnodes'));
+
+    // Get the MainNode container
+    var container = parent.parentNode;
+
+    // Set subnodeID based on the current level and 
+    // create a Subnode component
+    // Example: if subnodeID is `node_1.1` then level is 2
+    var level = parent.id.split('.').length + 1;
+    if(subnodeID.length == 0){
+        subnodeID = parent.id+'.'+parseInt(parentSubnodes+1);
+    }
+    var subnode = new Subnode(subnodeID,level, question, hasAttachment, type, options);
+
+    // If MainNode has no subnodes
+    if(parentSubnodes == 0){
+
+        // Create a list as container for subnodes
+        var list = document.createElement('ul');
+        list.setAttribute('id', parentID+'-subnodes');
+        list.classList.add('list-none','space-y-4');
+
+        // Create a item and append to list
+        var item = document.createElement('li');
+        item.setAttribute('id', parentID+'-subnode-1');
+        item.appendChild(subnode);
+        list.appendChild(item);
+
+        // Append list to the MainNode component's container
+        container.appendChild(list);   
+    }
+    // If MainNode has subnodes
+    else{
+        
+        // Create a item and append to list
+        var item = document.createElement('li');
+        item.appendChild(subnode);
+        item.setAttribute('id', parentID+'-subnode-'+parseInt(parentSubnodes+1));
+        var list = container.children[1];
+        list.appendChild(item);
+    }
+
+    // Increment the MainNode components data-subnodes attribute
+    parent.setAttribute('data-subnodes', parseInt(parentSubnodes+1));
+}
+
+/**
+ * Remove a MainNode component from a MainNode component
+ * 
+ * *Note: Parent node is automatically determined based on ID*
+ * 
+ * @param {String} subnodeID Id of the Subnode component to be removed
+ * @todo Add alert when subnode does not exist
+ */
+function deleteSubnode(subnodeID){
+
+    // Get parent MainNode component element
+    var parentID = subnodeID.slice(0, subnodeID.lastIndexOf('.'));
+    var parent = document.getElementById(parentID);
+
+    // Get parent's current subnodes
+    var parentSubnodes = parseInt(parent.getAttribute('data-subnodes'));
+
+    // Get parent MainNode's subnodes list element
+    var list = document.getElementById(parentID+'-subnodes')
+
+    // Get the subnode component
+    var item = document.getElementById(parentID+'-subnode-'+subnodeID.slice(subnodeID.lastIndexOf('.')+1));
+
+    // Get parent MainNode's container
+    var container = parent.parentNode;
+
+    // If parent MainNode has only 1 subnode
+    if(parentSubnodes == 1){
+        
+        // Remove subnode list from the MainNode component
+        // Decrement MainNode data-subnodes attribute
+        container.removeChild(list);
+        parent.setAttribute('data-subnodes', parentSubnodes-1);
+    }
+    // If parent MainNode has more than 1 subnode
+    else if(parentSubnodes > 1){
+
+        // Remove subnode from the MainNode subnodes list
+        // Decrement MainNode data-subnodes attribute
+        list.removeChild(item);
+        parent.setAttribute('data-subnodes', parentSubnodes-1);
+    }
+    // If parent MainNode has no subnode
+    else{
+        alert('Node has no more subnodes');
+    }
+}
+
+
+/**
+ * Change a node component answer type
+ * 
+ * @param {String} nodeID ID of the node component to be modified
+ * @param {String} type Node type - Possible values `('text','date','list')`
+ */
+function changeNode(nodeID, type = ''){
+
+    // Get node component element
+    var node = document.getElementById(nodeID);
+
+    // Get node's wrapper
+    var wrapper = node.children[0];
+    
+    var value = '';
+
+    // If type not defined
+    // Get the current value of component's typeSelectorField
+    if(type.length == 0){
+        var selector = document.getElementById(nodeID +'-type');
+        value = selector.value;
+    }
+    // Else, set value to type
+    else{
+        value = type;
+    }
+
+    // If type is list
+    if(value == 'list'){
+
+        // Create a container for options
+        var optionContainer = document.createElement('div');
+        optionContainer.setAttribute('id', nodeID+'-options');
+
+        // Create two Option component
+        var option1 = new Option(nodeID);
+        var option2 = new Option(nodeID);
+
+        // Append Option component to option container
+        optionContainer.appendChild(option1);
+        optionContainer.appendChild(option2);
+
+        // Append option container to wrapper
+        wrapper.appendChild(optionContainer);
+    }
+    // If type is not list
+    else{
+
+        // Get option container
+        optionContainer = document.getElementById(nodeID+'-options');
+
+        // Remove option container from wrapper and 
+        // Set wrapper's data-options attribute to 0
+        if(optionContainer){
+            wrapper.removeChild(optionContainer);
+            node.setAttribute('data-options', '0')
+        }
+    }
+}
+
+/**
+ * Add option to a nodeID
+ * 
+ * *Note: Only add if node type is set to `list`*
+ * 
+ * *Note: Also set the node type to `list` first
+ * before calling this function*
+ * 
+ * @param {nodeId} nodeID ID of the node component
+ */
+function addOption(nodeID){
+
+    // Get node's options container
+    var wrapper = document.getElementById(nodeID+'-options');
+
+    // Create a new Option component
+    var option = new Option(nodeID);
+
+    // Append Option component to wrapper
+    wrapper.appendChild(option);
+}
+
+/**
+ * Delete an option
+ * 
+ * @param {object} element X element of the option to be removed
+ * @todo Cleaner way of execution
+ */
+function deleteOption(element){
+    
+    // Get option component
+    var option = element.parentNode;
+
+    // Get option wrapper element
+    var parent = option.parentNode;
+
+    // Get node component element
+    var nodeID = parent.id.slice(0, parent.id.lastIndexOf('-'));
+    var node = document.getElementById(nodeID);
+
+    // Get nodes current options
+    var options = node.getAttribute('data-options');
+
+    // If node has more than 1 option
+    // Delete option
+    if(options > 1){
+        parent.removeChild(option);
+        node.setAttribute('data-options', options-1);
+    } 
+}
+
+function loadCurrentForm(json){
+    jsonObj = JSON.parse(json);
+    for(let node in jsonObj){
+        var question = jsonObj[node]["question"];
+        var hasAttachment = jsonObj[node]["has_attachment"];
+        var type = jsonObj[node]["type"];
+        var options = jsonObj[node]["options"];
+        if("parent" in jsonObj[node]){
+            parentNodeID = jsonObj[node]["parent"];
+            addSubnode(parentNodeID, node, question, hasAttachment, type, options);
+        }
+        else{
+            addMainNode(node, question, hasAttachment, type, options);
+        }
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="MainNode.html">MainNode</a></li><li><a href="Option.html">Option</a></li><li><a href="Subnode.html">Subnode</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addMainNode">addMainNode</a></li><li><a href="global.html#addOption">addOption</a></li><li><a href="global.html#addSubnode">addSubnode</a></li><li><a href="global.html#changeNode">changeNode</a></li><li><a href="global.html#deleteMainNode">deleteMainNode</a></li><li><a href="global.html#deleteOption">deleteOption</a></li><li><a href="global.html#deleteSubnode">deleteSubnode</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun Apr 30 2023 20:52:10 GMT+0800 (Singapore Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
