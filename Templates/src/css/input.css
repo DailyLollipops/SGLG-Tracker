@@ -7,6 +7,18 @@
         font-family: 'Open Sans', sans-serif;
     }
 }
+.ml-12 {
+    margin-left: 3rem;
+}
+.ml-24 {
+    margin-left: 6rem;
+  }
+.ml-36 {
+    margin-left: 9rem;
+}
+.ml-48 {
+    margin-left: 12rem;
+}
 
 .hamburger {
     cursor: pointer;

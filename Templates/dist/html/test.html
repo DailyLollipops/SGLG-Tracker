@@ -5,84 +5,58 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/output.css">
-    <title>Test</title>
-    <style>
-        .textarea[contenteditable]:empty::before {
-            content: "Question";
-            color: gray;
-        }
-    </style>
+    <script src="../js/test.js"></script>
+    <title>Document</title>
 </head>
 <body>
-    <div class="relative w-screen">
-        <section id="root">
-            <form action="">
-                <div class="flex flex-col mx-auto p-3">
-                    <div id="node_1" class="flex flex-row space-x-4 items-center md:justify-center">
-                        <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2">
-                            <div class="flex flex-col p-2">
-                                <span role="textbox" class="textarea grow-0 border-solid border-b-2 border-zinc-400 p-2" contenteditable></span>
-                                <input type="textarea" id="node_1-indicator" name="node_1-indicator" class="hidden border-solid border-2 rounded-full border-zinc-400 p-2" placeholder="Enter some text">                               
-                            </div>
-                            <div class="flex flex-row space-x-4">
-                                <div class="flex flex-row basis-1/2 p-2">
-                                    <input type="checkbox" id="node_1-has_attachment" name="node_1-has_attachment" class="border-solid border-2 rounded-full border-zinc-400 p-2">
-                                    <label for="node_1-has_attachment" class="my-auto m-2">Has attachments</label> 
-                                </div>
-                                <select name="node_1-type" id="node_1-type" class="type w-2/5 border-solid border-2 rounded-lg border-zinc-400 py-2">
-                                    <option value="text" class="text-sm">Text</option>
-                                    <option value="date" class="text-sm">Date</option>
-                                    <option value="list" class="text-sm">List</option>
-                                </select>    
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <div class="flex flex-row space-x-4 items-center">
-                                    <img src="../images/radio.png" alt="" class="h-4 ml-4 my-auto">
-                                    <input type="text" class="basis-2/3 border-solid border-b-2 border-zince-400 py-2 md:ml-2" placeholder="Option">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col space-y-4 place-content-center w-1/6 md:1/12">
-                            <div class="w-8 overflow-hidden inline-block">
-                                <div class=" h-4 w-4 bg-black rotate-45 transform origin-bottom-left"></div>
-                            </div>
-                            <div class="w-8 overflow-hidden inline-block">
-                                <div class=" h-4 w-4 bg-black -rotate-45 transform origin-top-left"></div>
-                           </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </section>
+    <div class="w-8 overflow-hidden inline-block">
+        <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addMainNode()">
     </div>
+    <div id="container" class="flex flex-col space-y-4" data-nodes="0"></div>
 
     <script>
-        var textArea = document.getElementById('node_1-indicator');
-        textArea.addEventListener("input", evt => {
-            textArea.style.height = textArea.scrollHeight + "px";
-        });
-        var dropdowns = document.querySelectorAll('.type');
-        dropdowns.forEach(changeNodeType);
-        function changeNodeType(element){
-            element.addEventListener('change', function(){
-                var nodeID = this.parentNode.parentNode.parentNode.id;
-                if(this.value == 'list'){
-                    var block =  '<div class="flex flex-col w-64 space-y-2">' +
-                                '<label for="' + nodeID+'-options' + '">Text</label>' +
-                                '<input type="text" id="' + nodeID+'-options' + '" name="' + nodeID+'-options' + '" class="border-solid border-2 rounded-full border-zinc-400 p-2" placeholder="Enter some text">' +
-                            '</div>'
-                    var box = document.createElement('div');
-                    box.innerHTML = block;
-                    this.parentNode.parentNode.appendChild(box);
-                    console.log(this.parentNode.parentNode.children);
-                }
-                else{
-                    box = document.getElementById(nodeID+'-options');
-                    if(box){
-                        box.parentNode.parentNode.parentNode.removeChild(box.parentNode.parentNode);
-                    }
-                }
-            });
+        var json = `{
+            "node_1": {
+                "question": "Node 1",
+                "has_attachment": true,
+                "type": "text",
+                "options": []
+            },
+            "node_1.2": {
+                "parent": "node_1",
+                "question": "Node 1.2",
+                "has_attachment": false,
+                "type": "list",
+                "options": ["Passed","Failed","Consideration"]
+            },
+            "node_2": {
+                "question": "Node 2",
+                "has_attachment": false,
+                "type": "list",
+                "options": ["Passed","Failed"]
+            },
+            "node_1.1": {
+                "parent": "node_1",
+                "question": "Node 1.1",
+                "has_attachment": false,
+                "type": "list",
+                "options": ["Passed","Failed"]
+            }
+        }`;
+        jsonObj = JSON.parse(json);
+        for(let node in jsonObj){
+            // console.log(jsonObj[node]);
+            var question = jsonObj[node]["question"];
+            var hasAttachment = jsonObj[node]["has_attachment"];
+            var type = jsonObj[node]["type"];
+            var options = jsonObj[node]["options"];
+            if("parent" in jsonObj[node]){
+                parentNodeID = jsonObj[node]["parent"];
+                addSubnode(parentNodeID, node, question, hasAttachment, type, options);
+            }
+            else{
+                addMainNode(node, question, hasAttachment, type, options);
+            }
         }
     </script>
 </body>
