@@ -1,5 +1,55 @@
+class Form{
+    constructor(containerID){
+        this.containerID = containerID;
+        this.element = document.getElementById(containerID);
+        this.element.classList.add('flex','flex-col','space-y-4');
+        this.element.setAttribute('data-nodes', '0');
+        this.nodes = {};
+    }
 
-class MainNode {
+    get(){
+        return this.element;
+    }
+
+    getWrapper(){
+        return this.element;
+    }
+
+    getID(){
+        return this.containerID;
+    }
+
+    addMainNode(nodeId, question='', hasAttachment = false, type = 'text', options = []){
+        var node = new FormNode(nodeId, question='', hasAttachment = false, type = 'text', options = []);
+        node.addTo(this);
+        this.nodes[nodeId] = node;
+    }
+
+    addSubNode(nodeId, question='', hasAttachment = false, type = 'text', options = []){
+        var parentNodeId = nodeId.slice(0, nodeId.lastIndexOf('-'));
+        console.log(parentNodeId);
+        var level = parentNodeId.split('-').length;
+        if(parentNodeId in this.nodes){
+            var parentNode = this.nodes[parentNodeId];
+            var parentSubnodes = parentNode.getSubnodes();
+            var nodeId = parentNodeId + '-' + parseInt(parentSubnodes+1);
+            var node = new FormNode(nodeId, question='', hasAttachment = false, type = 'text', options = []);
+            node.addTo(parentNode, false, level);
+            this.nodes[nodeId] = node;
+        }
+    }
+
+    removeNode(nodeId){
+        if(nodeId in this.nodes){
+            var node = this.nodes[nodeId];
+            node.remove();
+            delete this.nodes[nodeId];
+        }
+    }
+
+}
+
+class FormNode {
     /**
      * Create a MainNode Component
      * 
@@ -15,33 +65,41 @@ class MainNode {
      */
     constructor(id, question='', hasAttachment = false, type = 'text', options = []) {
 
+        // Set component id
+        this.id = id;
+
+        // Set parent container to null
+        this.container = null;
+
+        this.attachedToRoot = true;
+
         // Create a div element
         this.element = document.createElement('div');
 
         // Set element's classes
-        this.element.classList.add('node','flex','flex-col','space-y-4');
+        this.element.classList.add('wrapper','flex','flex-col','space-y-4');
 
         // Create the main component
-        this.element.innerHTML = '<div id="' + id +  '" class="flex flex-row space-x-4 items-center md:justify-center ml-12" data-options="' + options.length + '" data-subnodes="0">' +
-                    '<div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2">' +
+        this.element.innerHTML = '<div id="' + id +  '" class="node flex flex-row space-x-4 items-center md:justify-center" data-options="' + options.length + '" data-nodes="0" data-level="1">' +
+                    '<div id="' + id + '-form' + '" class="form flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2">' +
                         '<div class="flex flex-col p-2">' +
-                            '<span role="textbox" id="' + id + '-indicator" class="question textarea grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable></span>' + 
+                            '<span role="textbox" id="' + id + '-indicator" class="indicator textarea grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable></span>' + 
                         '</div>' +
                         '<div class="flex flex-row space-x-4">' +
                             '<div class="flex flex-row basis-1/2 p-2">' +
                                 '<input type="checkbox" id="' + id + '-has_attachment" name="' + id + '-has_attachment" class="attachment border-solid border-2 rounded-full border-zinc-400 p-2">' +
                                 '<label for="' + id + '-has_attachment" class="my-auto m-2">Has attachments</label>' +
                             '</div>' +
-                            '<select name="' + id + '-type" id="' + id + '-type" class="type w-2/5 border-solid border-2 rounded-lg border-zinc-400 py-2" onchange="changeNode(\'' +id+ '\')">' +
+                            '<select name="' + id + '-type" id="' + id + '-type" class="type w-2/5 border-solid border-2 rounded-lg border-zinc-400 py-2">' +
                                 '<option value="text" class="text-base">Text</option>' +
                                 '<option value="date" class="text-base">Date</option>' +
                                 '<option value="list" class="text-base">List</option>' +
                             '</select>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="flex flex-col space-y-4 items-center w-1/6 md:w-1/12">' +
+                    '<div class="node-menu flex flex-col space-y-4 items-center w-1/6 md:w-1/12">' +
                         '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/close.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="deleteMainNode(\'' +id+ '\')">' +
+                            '<img src="../images/close.png" alt="" class="delete-node w-4 h-4 my-auto ml-1 cursor-pointer">' +
                         '</div>' +
                         '<div class="w-8 overflow-hidden inline-block">' +
                             '<div class=" h-4 w-4 bg-black rotate-45 transform origin-bottom-left"></div>' +
@@ -50,121 +108,140 @@ class MainNode {
                             '<div class=" h-4 w-4 bg-black -rotate-45 transform origin-top-left"></div>' +
                         '</div>' +
                         '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addSubnode(\'' +id+ '\')">' +
+                            '<img src="../images/plus.png" alt="" class="add-node w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addSubnode(\'' +id+ '\')">' +
                         '</div>' +
                     '</div>' +
                 '</div>';
 
-        // Set question field's value
-        var questionField = this.element.querySelector('#'+ id + '-indicator');
-        questionField.innerText = question;
+        this.wrapper = this.element.querySelector('.wrapper');
+        this.node = this.element.querySelector('.node');
+        this.form = this.element.querySelector('.form');
+        this.questionField = this.element.querySelector('.indicator');
+        this.hasAttachmentField = this.element.querySelector('.attachment');
+        this.typeSelectorField = this.element.querySelector('.type');
+        this.deleteButton = this.element.querySelector('.delete-node');
+        this.addButton = this.element.querySelector('.add-node');
 
-        // Set the has_attachment checkbox value
-        var hasAttachmentField = this.element.querySelector('#'+ id + '-has_attachment');
-        hasAttachmentField.checked = hasAttachment;
-
-        // Set the node type
-        var typeSelectorField = this.element.querySelector('#'+ id + '-type');
-        typeSelectorField.value = type;
-
-        // Add options to node
+        this.questionField.innerText = question;
+        this.hasAttachmentField.checked = hasAttachment;
+        this.typeSelectorField.value = type;
         if(options.length > 0){
-            var optionContainer = document.createElement('div');
-            optionContainer.setAttribute('id', id+'-options');
+            this.optionContainer = document.createElement('div');
+            this.optionContainer.setAttribute('id', id+'-options');
             for(let i = 0; i < options.length; i++){
                 var option = new Option(id, option = options[i], true, i);
-                optionContainer.appendChild(option);
+                this.optionContainer.appendChild(option);
             }
-            var wrapper = this.element.children[0].children[0];
-            wrapper.appendChild(optionContainer);
+            this.node.appendChild(this.optionContainer);
         }
+    }
 
+    get(){
         return this.element;
     }
-}
 
-class Subnode{
-    /**
-     * Create a Subnode Component
-     * 
-     * Wrapped on the a MainNode Component
-     * 
-     * Serves as a sub-indicator for each main indicator
-     * 
-     * @param {String} id Component ID 
-     * @param {int} level Subnode level
-     * @param {String} question Node question, empty by default
-     * @param {boolean} hasAttachment Accepts attachment if `true`, otherwise `false`
-     * @param {String} type Node type - Possible values `('text','date','list')`
-     * @param {list} options Options list - Only add if type is set to `'list'`
-     */
-    constructor(id, level, question='', hasAttachment = false, type = 'text', options = []){
+    getWrapper(){
+        return this.wrapper;
+    }
 
-        // Create a div element
-        this.element = document.createElement('div');
+    getNode(){
+        return this.node;
+    }
 
-        // Set the element's classes
-        this.element.classList.add('node','flex','flex-col','space-y-4');
+    getID(){
+        return this.id;
+    }
 
-        // Create the main component
-        this.element.innerHTML = '<div id="' + id +  '" class="flex flex-row space-x-4 items-center md:justify-center ml-'+ level*12 +'" data-options="' + options.length + '" data-subnodes="0">' +
-                    '<div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2">' +
-                        '<div class="flex flex-col p-2">' +
-                            '<span role="textbox" id="' + id + '-indicator" class="question textarea grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable></span>' +        
-                        '</div>' +
-                        '<div class="flex flex-row space-x-4">' +
-                            '<div class="flex flex-row basis-1/2 p-2">' +
-                                '<input type="checkbox" id="' + id + '-has_attachment" name="' + id + '-has_attachment" class="attachment border-solid border-2 rounded-full border-zinc-400 p-2">' +
-                                '<label for="' + id + '-has_attachment" class="my-auto m-2">Has attachments</label>' +
-                            '</div>' +
-                            '<select name="' + id + '-type" id="' + id + '-type" class="type w-2/5 border-solid border-2 rounded-lg border-zinc-400 py-2" onchange="changeNode(\'' +id+ '\')">' +
-                                '<option value="text" class="text-base">Text</option>' +
-                                '<option value="date" class="text-base">Date</option>' +
-                                '<option value="list" class="text-base">List</option>' +
-                            '</select>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="flex flex-col space-y-4 items-center w-1/6 md:w-1/12">' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/close.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="deleteSubnode(\'' +id+ '\')">' +
-                        '</div>' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<div class=" h-4 w-4 bg-black rotate-45 transform origin-bottom-left"></div>' +
-                        '</div>' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<div class=" h-4 w-4 bg-black -rotate-45 transform origin-top-left"></div>' +
-                        '</div>' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addSubnode(\'' +id+ '\')">' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' ;
+    getSubnodes(){
+        var subnodes = parseInt(this.node.getAttribute('data-nodes'));
+        return subnodes;
+    }
 
-        // Set question field's value
-        var questionField = this.element.querySelector('#'+ id.replaceAll('.','\\.') + '-indicator');
-        questionField.innerText = question;
-
-        // Set the has_attachment checkbox value
-        var hasAttachmentField = this.element.querySelector('#'+ id.replaceAll('.','\\.') + '-has_attachment');
-        hasAttachmentField.checked = hasAttachment;
-
-        // Set the node type
-        var typeSelectorField = this.element.querySelector('#'+ id.replaceAll('.','\\.') + '-type');
-        typeSelectorField.value = type;
-
-        // Add options to node
-        if(options.length > 0){
-            var optionContainer = document.createElement('div');
-            optionContainer.setAttribute('id', id+'-options');
-            for(let i = 0; i < options.length; i++){
-                var option = new Option(id, option = options[i], true, i);
-                optionContainer.appendChild(option);
+    addTo(parentNode, root = true, level = 1){
+        this.container = parentNode;
+        if(root){
+            var currentContainerNode = parseInt(this.container.get().getAttribute('data-nodes'));
+            if(currentContainerNode == 0){
+                var list = document.createElement('ul');
+                list.classList.add('space-y-4');
+                list.setAttribute('id', this.container.getID()+'-subnodes');
+                var item = document.createElement('li');
+                item.appendChild(this.get());
+                list.appendChild(item);
+                this.container.get().appendChild(list);
+                this.container.get().setAttribute('data-nodes', '1');
             }
-            var wrapper = this.element.children[0].children[0];
-            wrapper.appendChild(optionContainer);
+            else{
+                var list = this.container.get().querySelector('#' +this.container.getID()+'-subnodes');
+                var item = document.createElement('li');
+                item.appendChild(this.get());
+                list.appendChild(item);
+                this.container.get().setAttribute('data-nodes', parseInt(currentContainerNode+1));
+            }
+        }
+        else{
+            this.attachedToRoot = false;
+            this.get().classList.add('ml-'+level*12)
+            this.get().setAttribute('level', level);
+            var currentContainerNode = parseInt(this.container.getNode().getAttribute('data-nodes'));
+            if(currentContainerNode == 0){
+                var list = document.createElement('ul');
+                list.classList.add('space-y-4');
+                list.setAttribute('id', this.container.getID()+'-subnodes');
+                var item = document.createElement('li');
+                item.appendChild(this.get());
+                list.appendChild(item);
+                this.container.get().appendChild(list);
+                this.container.getNode().setAttribute('data-nodes', '1');
+            }
+            else{
+                var list = this.container.get().querySelector('#' +this.container.getID()+'-subnodes');
+                var item = document.createElement('li');
+                item.appendChild(this.get());
+                list.appendChild(item);
+                this.container.getWrapper().setAttribute('data-nodes', parseInt(currentContainerNode+1));
+            }
         }
 
-        return this.element;
+        this.typeSelectorField.addEventListener('change', this.changeNode.bind(this));
+        this.deleteButton.addEventListener('click', this.remove.bind(this));
+    }
+
+    remove(){
+        if(this.attachedToRoot){
+            var currentContainerNode = parseInt(this.container.get().getAttribute('data-nodes'));
+        }
+        else{
+            var currentContainerNode = parseInt(this.container.getNode().getAttribute('data-nodes'));
+        }
+        var list = this.container.get().querySelector('#' +this.container.getID()+'-subnodes');
+        if(currentContainerNode == 1){
+            this.container.get().removeChild(list);
+        }
+        else{
+            list.removeChild(this.element.parentNode);
+        }
+        this.container.get().setAttribute('data-nodes', parseInt(currentContainerNode-1));
+        
+    }
+
+    changeNode(){
+        if(this.typeSelectorField.value == 'list'){
+            var optionContainer = document.createElement('div');
+            optionContainer.setAttribute('id', this.id+'-options');
+            var option1 = new Option(this.id);
+            var option2 = new Option(this.id);
+            optionContainer.appendChild(option1);
+            optionContainer.appendChild(option2);
+            this.form.appendChild(optionContainer);
+        }
+        else{
+            optionContainer = this.element.querySelector(this.id+'-options');
+            if(optionContainer){
+                wrapper.removeChild(optionContainer);
+                this.element.setAttribute('data-options', '0')
+            }
+        }
     }
 }
 
@@ -231,297 +308,6 @@ class Option{
 
         return this.element;
     }
-}
-
-/**
- * Add a MainNode component to the container
- * 
- * *Note: Uses a div with an id of `container`*
- * 
- * @param {String} id Component ID 
- * @param {String} question Node question, empty by default
- * @param {boolean} hasAttachment Accepts attachment if `true`, otherwise false
- * @param {String} type Node type - Possible values `('text','date','list')`
- * @param {list} options Options list - Only add if type is set to `'list'`
- * @todo Add additional parameter for specifying container ID
- */
-function addMainNode(mainNodeID = '', question='', hasAttachment = false, type = 'text', options = []){
-
-    // Get main container element
-    var container = document.getElementById('container');
-
-    // Get container current nodes
-    var currentNode = parseInt(container.getAttribute('data-nodes'));
-
-    // If mainNodeID is empty, set mainNodeID based on
-    // current nodes of container
-    if(mainNodeID.length == 0){
-        mainNodeID = 'node_' + parseInt(currentNode+1);
-    }
-
-    // Create a MainNode component
-    var node = new MainNode(mainNodeID, question, hasAttachment, type, options);
-
-    // Increment the container's data-nodes attribute
-    container.setAttribute('data-nodes', parseInt(currentNode+1));
-
-    // Wrap the component to the container
-    container.appendChild(node);
-}
-
-/**
- * Remove a MainNode component from the container
- * 
- * *Note: Uses a div with an id of `container`*
- * 
- * @param {String} mainNodeID Id of the MainNode component to be removed
- * @todo Add additional parameter for specifying container ID
- */
-function deleteMainNode(mainNodeID){
-
-    // Get the container element
-    var container = document.getElementById('container');
-
-    // Get the wrapper element
-    var mainNode = document.getElementById(mainNodeID).parentNode;
-
-    // If MainNode component exist
-    if(mainNode){
-
-        // Decrement the container's data-nodes attribute
-        var currentNode = parseInt(container.getAttribute('data-nodes'));
-        container.setAttribute('data-nodes', parseInt(currentNode-1))
-
-        // Remove the node to main container
-        container.removeChild(mainNode);
-    }
-    // If not, alert
-    else{
-        alert('MainNode component does not exist');
-    }
-}
-
-/**
- * Add a Subnode component to a MainNode component
- * 
- * @param {String} parentID MainNode ID to attach to
- * @param {String} subnodeID Component ID 
- * @param {String} question Node question, empty by default
- * @param {boolean} hasAttachment Accepts attachment if `true`, otherwise false
- * @param {String} type Node type - Possible values `('text','date','list')`
- * @param {list} options Options list - Only add if type is set to `'list'`
- * @todo Add additional parameter for specifying container ID
- */
-function addSubnode(parentID, subnodeID = '', question='', hasAttachment = false, type = 'text', options = []){
-    
-    // Get MainNode component element
-    var parent = document.getElementById(parentID);
-
-    // Get current data-subnodes of the MainNode component
-    var parentSubnodes = parseInt(parent.getAttribute('data-subnodes'));
-
-    // Get the MainNode container
-    var container = parent.parentNode;
-
-    // Set subnodeID based on the current level and 
-    // create a Subnode component
-    // Example: if subnodeID is `node_1.1` then level is 2
-    var level = parent.id.split('.').length + 1;
-    if(subnodeID.length == 0){
-        subnodeID = parent.id+'.'+parseInt(parentSubnodes+1);
-    }
-    var subnode = new Subnode(subnodeID,level, question, hasAttachment, type, options);
-
-    // If MainNode has no subnodes
-    if(parentSubnodes == 0){
-
-        // Create a list as container for subnodes
-        var list = document.createElement('ul');
-        list.setAttribute('id', parentID+'-subnodes');
-        list.classList.add('list-none','space-y-4');
-
-        // Create a item and append to list
-        var item = document.createElement('li');
-        item.setAttribute('id', parentID+'-subnode-1');
-        item.appendChild(subnode);
-        list.appendChild(item);
-
-        // Append list to the MainNode component's container
-        container.appendChild(list);   
-    }
-    // If MainNode has subnodes
-    else{
-        
-        // Create a item and append to list
-        var item = document.createElement('li');
-        item.appendChild(subnode);
-        item.setAttribute('id', parentID+'-subnode-'+parseInt(parentSubnodes+1));
-        var list = container.children[1];
-        list.appendChild(item);
-    }
-
-    // Increment the MainNode components data-subnodes attribute
-    parent.setAttribute('data-subnodes', parseInt(parentSubnodes+1));
-}
-
-/**
- * Remove a MainNode component from a MainNode component
- * 
- * *Note: Parent node is automatically determined based on ID*
- * 
- * @param {String} subnodeID Id of the Subnode component to be removed
- * @todo Add alert when subnode does not exist
- */
-function deleteSubnode(subnodeID){
-
-    // Get parent MainNode component element
-    var parentID = subnodeID.slice(0, subnodeID.lastIndexOf('.'));
-    var parent = document.getElementById(parentID);
-
-    // Get parent's current subnodes
-    var parentSubnodes = parseInt(parent.getAttribute('data-subnodes'));
-
-    // Get parent MainNode's subnodes list element
-    var list = document.getElementById(parentID+'-subnodes')
-
-    // Get the subnode component
-    var item = document.getElementById(parentID+'-subnode-'+subnodeID.slice(subnodeID.lastIndexOf('.')+1));
-
-    // Get parent MainNode's container
-    var container = parent.parentNode;
-
-    // If parent MainNode has only 1 subnode
-    if(parentSubnodes == 1){
-        
-        // Remove subnode list from the MainNode component
-        // Decrement MainNode data-subnodes attribute
-        container.removeChild(list);
-        parent.setAttribute('data-subnodes', parentSubnodes-1);
-    }
-    // If parent MainNode has more than 1 subnode
-    else if(parentSubnodes > 1){
-
-        // Remove subnode from the MainNode subnodes list
-        // Decrement MainNode data-subnodes attribute
-        list.removeChild(item);
-        parent.setAttribute('data-subnodes', parentSubnodes-1);
-    }
-    // If parent MainNode has no subnode
-    else{
-        alert('Node has no more subnodes');
-    }
-}
-
-
-/**
- * Change a node component answer type
- * 
- * @param {String} nodeID ID of the node component to be modified
- * @param {String} type Node type - Possible values `('text','date','list')`
- */
-function changeNode(nodeID, type = ''){
-
-    // Get node component element
-    var node = document.getElementById(nodeID);
-
-    // Get node's wrapper
-    var wrapper = node.children[0];
-    
-    var value = '';
-
-    // If type not defined
-    // Get the current value of component's typeSelectorField
-    if(type.length == 0){
-        var selector = document.getElementById(nodeID +'-type');
-        value = selector.value;
-    }
-    // Else, set value to type
-    else{
-        value = type;
-    }
-
-    // If type is list
-    if(value == 'list'){
-
-        // Create a container for options
-        var optionContainer = document.createElement('div');
-        optionContainer.setAttribute('id', nodeID+'-options');
-
-        // Create two Option component
-        var option1 = new Option(nodeID);
-        var option2 = new Option(nodeID);
-
-        // Append Option component to option container
-        optionContainer.appendChild(option1);
-        optionContainer.appendChild(option2);
-
-        // Append option container to wrapper
-        wrapper.appendChild(optionContainer);
-    }
-    // If type is not list
-    else{
-
-        // Get option container
-        optionContainer = document.getElementById(nodeID+'-options');
-
-        // Remove option container from wrapper and 
-        // Set wrapper's data-options attribute to 0
-        if(optionContainer){
-            wrapper.removeChild(optionContainer);
-            node.setAttribute('data-options', '0')
-        }
-    }
-}
-
-/**
- * Add option to a nodeID
- * 
- * *Note: Only add if node type is set to `list`*
- * 
- * *Note: Also set the node type to `list` first
- * before calling this function*
- * 
- * @param {nodeId} nodeID ID of the node component
- */
-function addOption(nodeID){
-
-    // Get node's options container
-    var wrapper = document.getElementById(nodeID+'-options');
-
-    // Create a new Option component
-    var option = new Option(nodeID);
-
-    // Append Option component to wrapper
-    wrapper.appendChild(option);
-}
-
-/**
- * Delete an option
- * 
- * @param {object} element X element of the option to be removed
- * @todo Cleaner way of execution
- */
-function deleteOption(element){
-    
-    // Get option component
-    var option = element.parentNode;
-
-    // Get option wrapper element
-    var parent = option.parentNode;
-
-    // Get node component element
-    var nodeID = parent.id.slice(0, parent.id.lastIndexOf('-'));
-    var node = document.getElementById(nodeID);
-
-    // Get nodes current options
-    var options = node.getAttribute('data-options');
-
-    // If node has more than 1 option
-    // Delete option
-    if(options > 1){
-        parent.removeChild(option);
-        node.setAttribute('data-options', options-1);
-    } 
 }
 
 function loadCurrentForm(json){

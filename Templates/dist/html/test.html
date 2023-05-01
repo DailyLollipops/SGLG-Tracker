@@ -5,59 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/output.css">
-    <script src="../js/test.js"></script>
+    <script src="../js/form.js"></script>
     <title>Document</title>
 </head>
 <body>
     <div class="w-8 overflow-hidden inline-block">
         <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addMainNode()">
     </div>
-    <div id="container" class="flex flex-col space-y-4" data-nodes="0"></div>
+    <div id="container"></div>
 
     <script>
-        var json = `{
-            "node_1": {
-                "question": "Node 1",
-                "has_attachment": true,
-                "type": "text",
-                "options": []
-            },
-            "node_1.2": {
-                "parent": "node_1",
-                "question": "Node 1.2",
-                "has_attachment": false,
-                "type": "list",
-                "options": ["Passed","Failed","Consideration"]
-            },
-            "node_2": {
-                "question": "Node 2",
-                "has_attachment": false,
-                "type": "list",
-                "options": ["Passed","Failed"]
-            },
-            "node_1.1": {
-                "parent": "node_1",
-                "question": "Node 1.1",
-                "has_attachment": false,
-                "type": "list",
-                "options": ["Passed","Failed"]
-            }
-        }`;
-        jsonObj = JSON.parse(json);
-        for(let node in jsonObj){
-            // console.log(jsonObj[node]);
-            var question = jsonObj[node]["question"];
-            var hasAttachment = jsonObj[node]["has_attachment"];
-            var type = jsonObj[node]["type"];
-            var options = jsonObj[node]["options"];
-            if("parent" in jsonObj[node]){
-                parentNodeID = jsonObj[node]["parent"];
-                addSubnode(parentNodeID, node, question, hasAttachment, type, options);
-            }
-            else{
-                addMainNode(node, question, hasAttachment, type, options);
-            }
-        }
+
+        var form = new Form('container');
+        form.addMainNode('node_1');
+        form.addMainNode('node_2');
+        form.addSubNode('node_1-1');
     </script>
 </body>
 </html>
