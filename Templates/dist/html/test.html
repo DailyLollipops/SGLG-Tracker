@@ -10,16 +10,12 @@
 </head>
 <body>
     <div class="w-8 overflow-hidden inline-block">
-        <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="addMainNode()">
+        <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="form.addMainNode()">
     </div>
     <div id="container"></div>
-
     <script>
 
         var form = new Form('container');
-        form.addMainNode('node_1');
-        form.addMainNode('node_2');
-        form.addSubNode('node_1-1');
     </script>
 </body>
 </html>
