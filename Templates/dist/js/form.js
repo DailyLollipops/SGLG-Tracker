@@ -91,7 +91,7 @@ class Form{
             var id = node.getAttribute('id');
             var parent = node.getAttribute('data-parent');
             var question = node.querySelector('.indicator').innerHTML;
-            var hasAttachment = node.querySelector('.attachment').value;
+            var hasAttachment = node.querySelector('.attachment').checked;
             var type = node.querySelector('.type').value;
             var nodeOptions = parseInt(node.getAttribute('data-options'));
             if(nodeOptions > 0){
@@ -121,7 +121,6 @@ class Form{
         else{
             alert('Please complete or delete blank fields');
             var errorNode = this.element.querySelector('#' + nodeIdWithError);
-            console.log(errorNode.children[0]);
             errorNode.children[0].classList.remove('border-slate-300');
             errorNode.children[0].classList.add('border-red-500');
         }
