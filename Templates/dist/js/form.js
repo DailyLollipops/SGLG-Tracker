@@ -33,24 +33,25 @@ class Form{
         return subnodes;
     }
 
+    getSubnodesContainer(){
+        var container = this.element.querySelector('#' +this.containerId+'-subnodes');
+        return container;
+    }
+
     addMainNode(nodeId = '', question='', hasAttachment = false, type = 'text', options = []){
         if(nodeId.length == 0){
             nodeId = stringGen(8);
         }
-        var node = new FormNode(nodeId, question='', hasAttachment = false, type = 'text', options = []);
+        var node = new FormNode(nodeId, question, hasAttachment, type, options);
         node.addTo(this);
         this.nodes[nodeId] = node;
     }
  
-    addSubNode(nodeId, question='', hasAttachment = false, type = 'text', options = []){
-        var parentNodeId = nodeId.slice(0, nodeId.lastIndexOf('-'));
-        var level = parentNodeId.split('-').length;
+    addSubNode(parentNodeId, nodeId = '', question = '', hasAttachment = false, type = 'text', options = []){
         if(parentNodeId in this.nodes){
-            var parentNode = this.nodes[parentNodeId];
-            var parentSubnodes = parentNode.getSubnodes();
-            var nodeId = parentNodeId + '-' + parseInt(parentSubnodes+1);
-            var node = new FormNode(nodeId, question='', hasAttachment = false, type = 'text', options = []);
-            node.addTo(parentNode, false, level);
+            var parentNode = this.nodes[parentNodeId]
+            var node = new FormNode(nodeId, question, hasAttachment, type, options);
+            node.addTo(parentNode);
             this.nodes[nodeId] = node;
         }
     }
@@ -62,10 +63,48 @@ class Form{
             delete this.nodes[nodeId];
         }
     }
+    
+    load(json){
+        for(let node in json){
+            var question = json[node]['question'];
+            var hasAttachment = json[node]['has_attachment'];
+            var type = json[node]['type'];
+            var options = json[node]['options'];
+            if(json[node]['parent'] != this.containerId){
+                var parentNodeID = json[node]["parent"];
+                this.addSubNode(parentNodeID, node, question, hasAttachment, type, options);
+            }
+            else{
+               this.addMainNode(node, question, hasAttachment, type, options);
+            }
+        }
+    }
 
-    getSubnodesContainer(){
-        var container = this.element.querySelector('#' +this.containerId+'-subnodes');
-        return container;
+    save(){
+        var json = {};
+        var nodes = this.element.querySelectorAll('.node');
+        nodes.forEach(function(node){
+            var options = []
+            var id = node.getAttribute('id');
+            var question = node.querySelector('.indicator').innerHTML;
+            var hasAttachment = node.querySelector('.attachment').value;
+            var type = node.querySelector('.type').value;
+            var nodeOptions = parseInt(node.getAttribute('data-options'));
+            if(nodeOptions > 0){
+                var optionFields = node.querySelectorAll('.option')
+                optionFields.forEach(function(optionField){
+                    options.push(optionField.value);
+                });
+            }
+            json[id] = {
+                "question": question,
+                "has_attachment": hasAttachment,
+                "type": type,
+                "options": options
+            }
+        });
+        console.log(json);
+        return json;
     }
 }
  
@@ -90,7 +129,7 @@ class FormNode {
         this.attachedToRoot = true;
  
         this.level = 1;
-        
+
         // Create a div element
         this.element = document.createElement('div');
  
@@ -98,7 +137,7 @@ class FormNode {
         this.element.classList.add('wrapper','flex','flex-col','space-y-4');
  
         // Create the main component
-        this.element.innerHTML = '<div id="' + id +  '" class="node flex flex-row space-x-4 items-center md:justify-center" data-options="' + options.length + '" data-nodes="0" data-level="1">' +
+        this.element.innerHTML = '<div id="' + id +  '" class="node flex flex-row space-x-4 items-center md:justify-center" data-options="' + options.length + '" data-nodes="0" data-level="1" data-parent="">' +
                     '<div id="' + id + '-form' + '" class="form flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2 hover:border-l-8 hover:border-l-indigo-500">' +
                         '<div class="flex flex-col p-2">' +
                             '<span role="textbox" id="' + id + '-indicator" class="indicator textarea grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable></span>' + 
@@ -149,13 +188,9 @@ class FormNode {
         this.hasAttachmentField.checked = hasAttachment;
         this.typeSelectorField.value = type;
         if(options.length > 0){
-            this.optionContainer = document.createElement('div');
-            this.optionContainer.setAttribute('id', id+'-options');
             for(let i = 0; i < options.length; i++){
-                var option = new Option(id, option = options[i], true, i);
-                this.optionContainer.appendChild(option);
+                this.addOption(this, options[i]);
             }
-            this.node.appendChild(this.optionContainer);
         }
     }
  
@@ -184,6 +219,21 @@ class FormNode {
     getLevel(){
         this.level = parseInt(this.node.getAttribute('data-level'));
         return this.level;
+    }
+
+    getData(){
+        var optionFields = this.form.querySelectorAll('.option');
+        var options = [];
+        for(let i = 0; i < optionFields.length; i++){
+            options.push(optionFields[i].value);
+        }
+        var data = {};
+        data['parent'] = this.container.getId();
+        data['question'] = this.questionField.innerHTML;
+        data['has_attachment'] = this.hasAttachmentField.checked;
+        data['type'] = this.typeSelectorField.value;
+        data['options'] = options;
+        return data;
     }
 
     addTo(parentNode){
@@ -323,23 +373,6 @@ class FormNode {
         this.deleteButton.classList.remove('hidden');
         this.moveUpButton.classList.remove('hidden');
         this.moveDownButton.classList.remove('hidden');
-    }
-}
- 
-function loadCurrentForm(json){
-    jsonObj = JSON.parse(json);
-    for(let node in jsonObj){
-        var question = jsonObj[node]["question"];
-        var hasAttachment = jsonObj[node]["has_attachment"];
-        var type = jsonObj[node]["type"];
-        var options = jsonObj[node]["options"];
-        if("parent" in jsonObj[node]){
-            parentNodeID = jsonObj[node]["parent"];
-            addSubnode(parentNodeID, node, question, hasAttachment, type, options);
-        }
-        else{
-            addMainNode(node, question, hasAttachment, type, options);
-        }
     }
 }
  

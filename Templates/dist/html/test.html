@@ -12,10 +12,42 @@
     <div class="w-8 overflow-hidden inline-block">
         <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="form.addMainNode()">
     </div>
+    <div class="w-8 overflow-hidden inline-block">
+        <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="form.save()">
+    </div>
     <div id="container"></div>
     <script>
 
-        var form = new Form('container');
+        var form = new Form("container");
+        var formConfig = `{
+            "node-1" : {
+                "parent": "container",
+                "question": "How are you?",
+                "has_attachment": true,
+                "type": "text",
+                "options": []
+            },
+            "node-2" : {
+                "parent": "container",
+                "question": "What are you?",
+                "has_attachment": true,
+                "type": "checkbox",
+                "options": ["Im fine","Not good","Maybe"]
+            },
+            "node-3" : {
+                "parent": "node-2",
+                "question": "Where are you?",
+                "has_attachment": true,
+                "type": "checkbox",
+                "options": ["Im fine","Not good","Maybe"]
+            }
+        }`
+
+        // var json = JSON.parse(formConfig)
+        // form.load(json);
+        // form.addMainNode('id', 'question', true, 'checkbox', ['1','2','6']);
+        // var node1 = new FormNode('id', 'question', true, 'checkbox', ['1','2','6']);
+        // node1.addTo(form);
     </script>
 </body>
 </html>
