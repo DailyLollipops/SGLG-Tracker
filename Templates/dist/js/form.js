@@ -159,7 +159,7 @@ class FormNode {
         this.element.innerHTML = '<div id="' + id +  '" class="node flex flex-row space-x-4 items-center md:justify-center" data-options="' + options.length + '" data-nodes="0" data-level="1" data-parent="">' +
                     '<div id="' + id + '-form' + '" class="form flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2 hover:border-l-8 hover:border-l-indigo-500">' +
                         '<div class="flex flex-col p-2">' +
-                            '<span role="textbox" id="' + id + '-indicator" class="indicator textarea text-sm grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable></span>' + 
+                            '<span role="textbox" id="' + id + '-indicator" class="indicator textarea text-sm grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1 outline-none" contenteditable></span>' + 
                         '</div>' +
                         '<div class="flex flex-row space-x-4">' +
                             '<div class="flex flex-row items-center basis-1/2 p-2">' +
