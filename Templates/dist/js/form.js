@@ -119,16 +119,16 @@ class FormNode {
                     '</div>' +
                     '<div class="node-menu flex flex-col space-y-4 items-center w-1/6 md:w-1/12">' +
                         '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/close.png" alt="" class="delete-node w-4 h-4 my-auto ml-1 cursor-pointer">' +
+                            '<img src="../images/close.png" alt="" class="delete-node hidden w-4 h-4 my-auto ml-1 cursor-pointer">' +
                         '</div>' +
                         '<div class="w-8 overflow-hidden inline-block">' +
-                            '<div class="move-up h-4 w-4 bg-black rotate-45 transform origin-bottom-left cursor-pointer"></div>' +
+                            '<div class="move-up hidden h-4 w-4 bg-black rotate-45 transform origin-bottom-left cursor-pointer"></div>' +
                         '</div>' +
                         '<div class="w-8 overflow-hidden inline-block">' +
-                            '<div class="move-down h-4 w-4 bg-black -rotate-45 transform origin-top-left cursor-pointer"></div>' +
+                            '<div class="move-down hidden h-4 w-4 bg-black -rotate-45 transform origin-top-left cursor-pointer"></div>' +
                         '</div>' +
                         '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/plus.png" alt="" class="add-node w-4 h-4 my-auto ml-1 cursor-pointer">' +
+                            '<img src="../images/plus.png" alt="" class="add-node hidden w-4 h-4 my-auto ml-1 cursor-pointer">' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
@@ -143,6 +143,7 @@ class FormNode {
         this.addButton = this.element.querySelector('.add-node');
         this.moveUpButton = this.element.querySelector('.move-up');
         this.moveDownButton = this.element.querySelector('.move-down');
+        this.menu = this.element.querySelector('.node-menu');
 
         this.questionField.innerText = question;
         this.hasAttachmentField.checked = hasAttachment;
@@ -205,6 +206,10 @@ class FormNode {
         this.addButton.addEventListener('click', this.addSubNode.bind(this));
         this.moveUpButton.addEventListener('click', this.moveUp.bind(this));
         this.moveDownButton.addEventListener('click', this.moveDown.bind(this));
+        this.form.addEventListener('mouseenter', this.showMenu.bind(this));
+        this.form.addEventListener('mouseleave', this.hideMenu.bind(this));
+        this.menu.addEventListener('mouseenter', this.showMenu.bind(this));
+        this.menu.addEventListener('mouseleave', this.hideMenu.bind(this));
     }
  
     remove(){
@@ -304,6 +309,20 @@ class FormNode {
         if(item.nextElementSibling){
             this.container.getSubnodesContainer().insertBefore(item.nextElementSibling, item );
         }
+    }
+
+    hideMenu(e){
+        this.addButton.classList.add('hidden');
+        this.deleteButton.classList.add('hidden');
+        this.moveUpButton.classList.add('hidden');
+        this.moveDownButton.classList.add('hidden');
+    }
+
+    showMenu(e){
+        this.addButton.classList.remove('hidden');
+        this.deleteButton.classList.remove('hidden');
+        this.moveUpButton.classList.remove('hidden');
+        this.moveDownButton.classList.remove('hidden');
     }
 }
  
