@@ -164,7 +164,7 @@ class FormNode {
                         '<div class="flex flex-row space-x-4">' +
                             '<div class="flex flex-row items-center basis-1/2 p-2">' +
                                 '<input type="checkbox" id="' + id + '-has_attachment" name="' + id + '-has_attachment" value="" class="attachment w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">' +
-                                '<label for="' + id + '-has_attachment" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Checked state</label>' +
+                                '<label for="' + id + '-has_attachment" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Has Attachment</label>' +
                             '</div>' +
                             '<div class="relative h-10 w-72 min-w-[200px]">' +
                             '<select name="' + id + '-type" id="' + id + '-type" class="type peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-red-500 focus:border-2 focus:border-pink-500 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50">' +
