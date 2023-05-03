@@ -63,7 +63,7 @@ class Form{
             delete this.nodes[nodeId];
         }
     }
-    
+
     load(json){
         for(let node in json){
             var question = json[node]['question'];
@@ -83,7 +83,10 @@ class Form{
     save(){
         var json = {};
         var nodes = this.element.querySelectorAll('.node');
-        nodes.forEach(function(node){
+        var validated = true;
+        var nodeIdWithError = '';
+        for(let i = 0; i < nodes.length; i++){
+            var node = nodes[i];
             var options = []
             var id = node.getAttribute('id');
             var question = node.querySelector('.indicator').innerHTML;
@@ -93,8 +96,15 @@ class Form{
             if(nodeOptions > 0){
                 var optionFields = node.querySelectorAll('.option')
                 optionFields.forEach(function(optionField){
-                    options.push(optionField.value);
+                    if(optionField.value.length > 0){
+                        options.push(optionField.value);
+                    }
                 });
+            }
+            if(question.length == 0 || (nodeOptions > 0 && options.length <= 1)){
+                validated = false;
+                nodeIdWithError = id;
+                break;
             }
             json[id] = {
                 "question": question,
@@ -102,9 +112,17 @@ class Form{
                 "type": type,
                 "options": options
             }
-        });
-        console.log(json);
-        return json;
+        }
+        if(validated){
+            return json;
+        }
+        else{
+            alert('Please complete or delete blank fields');
+            var errorNode = this.element.querySelector('#' + nodeIdWithError);
+            console.log(errorNode.children[0]);
+            errorNode.children[0].classList.remove('border-slate-300');
+            errorNode.children[0].classList.add('border-red-500');
+        }
     }
 }
  
@@ -369,6 +387,8 @@ class FormNode {
     }
 
     showMenu(e){
+        this.form.classList.remove('border-red-500');
+        this.form.classList.add('border-slate-300');
         this.addButton.classList.remove('hidden');
         this.deleteButton.classList.remove('hidden');
         this.moveUpButton.classList.remove('hidden');
