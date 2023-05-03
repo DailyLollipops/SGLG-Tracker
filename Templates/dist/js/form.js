@@ -160,35 +160,40 @@ class FormNode {
         this.element.innerHTML = '<div id="' + id +  '" class="node flex flex-row space-x-4 items-center md:justify-center" data-options="' + options.length + '" data-nodes="0" data-level="1" data-parent="">' +
                     '<div id="' + id + '-form' + '" class="form flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2 hover:border-l-8 hover:border-l-indigo-500">' +
                         '<div class="flex flex-col p-2">' +
-                            '<span role="textbox" id="' + id + '-indicator" class="indicator textarea grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable></span>' + 
+                            '<span role="textbox" id="' + id + '-indicator" class="indicator textarea text-sm grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1" contenteditable></span>' + 
                         '</div>' +
                         '<div class="flex flex-row space-x-4">' +
-                            '<div class="flex flex-row basis-1/2 p-2">' +
-                                '<input type="checkbox" id="' + id + '-has_attachment" name="' + id + '-has_attachment" class="attachment border-solid border-2 rounded-full border-zinc-400 p-2">' +
-                                '<label for="' + id + '-has_attachment" class="my-auto m-2 hover:text-sky-300">Has attachments</label>' +
+                            '<div class="flex flex-row items-center basis-1/2 p-2">' +
+                                '<input type="checkbox" id="' + id + '-has_attachment" name="' + id + '-has_attachment" value="" class="attachment w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">' +
+                                '<label for="' + id + '-has_attachment" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Checked state</label>' +
                             '</div>' +
-                            '<select name="' + id + '-type" id="' + id + '-type" class="type w-2/5 border-solid border-2 rounded-lg border-zinc-400 py-2">' +
+                            '<div class="relative h-10 w-72 min-w-[200px]">' +
+                            '<select name="' + id + '-type" id="' + id + '-type" class="type peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-red-500 focus:border-2 focus:border-pink-500 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50">' +
                                 '<option value="placeholder" class="text-base">Title</option>' +
                                 '<option value="text" class="text-base">Short Answer</option>' +
                                 '<option value="date" class="text-base">Date</option>' +
                                 '<option value="multiple_choice" class="text-base">Multiple Choices</option>' +
                                 '<option value="checkbox" class="text-base">Checkboxes</option>' +
                             '</select>' +
+                            '<label class="before:content[\' \'] after:content[\' \'] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-pink-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-pink-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-pink-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">' +
+                                'Choose Answer Type' +
+                            '</label>' +
+                            '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="node-menu flex flex-col space-y-4 items-center w-1/6 md:w-1/12">' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/close.png" alt="" class="delete-node hidden w-4 h-4 my-auto ml-1 cursor-pointer">' +
-                        '</div>' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<div class="move-up hidden h-4 w-4 bg-black rotate-45 transform origin-bottom-left cursor-pointer"></div>' +
-                        '</div>' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<div class="move-down hidden h-4 w-4 bg-black -rotate-45 transform origin-top-left cursor-pointer"></div>' +
-                        '</div>' +
-                        '<div class="w-8 overflow-hidden inline-block">' +
-                            '<img src="../images/plus.png" alt="" class="add-node hidden w-4 h-4 my-auto ml-1 cursor-pointer">' +
-                        '</div>' +
+                    '<div class="node-menu flex flex-col items-center">' +
+                        '<button class="delete-node hidden font-bold py-1 inline-flex items-center">' +
+                            '<img src="../images/bin.png">' +
+                        '</button>' +
+                        '<button class="move-up hidden font-bold py-1 inline-flex items-center">' +
+                            '<img src="../images/up-arrow.png">' +
+                        '</button>' +
+                        '<button class="move-down hidden font-bold py-1 inline-flex items-center">' +
+                            '<img src="../images/down-arrow.png">' +
+                        '</button>' +
+                        '<button class="add-node hidden font-bold py-1 inline-flex items-center">' +
+                            '<img src="../images/add.png">' +
+                        '</button>' +
                     '</div>' +
                 '</div>' +
                 '<ul id="'+ this.id +'-subnodes" class="hidden space-y-4"></ul>';
@@ -276,10 +281,8 @@ class FormNode {
         this.addButton.addEventListener('click', this.addSubNode.bind(this));
         this.moveUpButton.addEventListener('click', this.moveUp.bind(this));
         this.moveDownButton.addEventListener('click', this.moveDown.bind(this));
-        this.form.addEventListener('mouseenter', this.showMenu.bind(this));
-        this.form.addEventListener('mouseleave', this.hideMenu.bind(this));
-        this.menu.addEventListener('mouseenter', this.showMenu.bind(this));
-        this.menu.addEventListener('mouseleave', this.hideMenu.bind(this));
+        this.node.addEventListener('mouseenter', this.showMenu.bind(this));
+        this.node.addEventListener('mouseleave', this.hideMenu.bind(this));
     }
  
     remove(){
@@ -323,9 +326,9 @@ class FormNode {
             else{
                 image = 'radio';
             }
-            var option1 = `<img src="../images/${image}.png" alt="" class="h-4 ml-4 my-auto"><input type="text" name="${this.id}-option" id="${this.id}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 md:ml-2 md:basis-3/4" placeholder="Option">`;
-            var option2 = `<img src="../images/${image}.png" alt="" class="h-4 ml-4 my-auto"><input type="text" name="${this.id}-option" id="${this.id}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 md:ml-2 md:basis-3/4" placeholder="Option"><img src="../images/plus.png" alt="" class="add-option h-4 my-auto cursor-pointer">`;
-            var option3 = `<img src="../images/${image}.png" alt="" class="h-4 ml-4 my-auto"><input type="text" name="${this.id}-option" id="${this.id}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 md:ml-2 md:basis-3/4" placeholder="Option"><img src="../images/plus.png" alt="" class="add-option h-4 my-auto cursor-pointer"><img src="../images/close.png" alt="" class="delete-option h-4 my-auto cursor-pointer">`;
+            var option1 = `<img src="../images/${image}.png" alt="" class="h-4 ml-4 my-auto"><input type="text" name="${this.id}-option" id="${this.id}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 pl-2 text-sm md:ml-2 md:basis-3/4" placeholder="Option">`;
+            var option2 = `<img src="../images/${image}.png" alt="" class="h-4 ml-4 my-auto"><input type="text" name="${this.id}-option" id="${this.id}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 pl-2 text-sm md:ml-2 md:basis-3/4" placeholder="Option"><img src="../images/plus.png" alt="" class="add-option h-4 my-auto cursor-pointer">`;
+            var option3 = `<img src="../images/${image}.png" alt="" class="h-4 ml-4 my-auto"><input type="text" name="${this.id}-option" id="${this.id}-option" value="${option}" class="option basis-2/3 border-solid border-b-2 border-zince-400 py-2 pl-2 text-sm md:ml-2 md:basis-3/4" placeholder="Option"><img src="../images/plus.png" alt="" class="add-option h-4 my-auto cursor-pointer"><img src="../images/close.png" alt="" class="delete-option h-4 my-auto cursor-pointer">`;
             var option = document.createElement('div');
             option.classList.add('flex','flex-row','space-x-4','items-center');
             option.setAttribute('id', optionId);
@@ -397,7 +400,7 @@ class FormNode {
         this.moveDownButton.classList.remove('hidden');
     }
 }
- 
+
 function stringGen(len)
 {
     var text = '';
