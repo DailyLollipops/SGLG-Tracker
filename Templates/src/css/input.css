@@ -7,6 +7,13 @@
         font-family: 'Open Sans', sans-serif;
     }
 }
+
+span[contenteditable]:empty:focus::before,
+span[contenteditable]:empty::before{
+    content: 'Question';
+    color: gray;
+}
+
 .ml-12 {
     margin-left: 3rem;
 }
