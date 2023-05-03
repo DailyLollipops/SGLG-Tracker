@@ -89,6 +89,7 @@ class Form{
             var node = nodes[i];
             var options = []
             var id = node.getAttribute('id');
+            var parent = node.getAttribute('data-parent');
             var question = node.querySelector('.indicator').innerHTML;
             var hasAttachment = node.querySelector('.attachment').value;
             var type = node.querySelector('.type').value;
@@ -107,6 +108,7 @@ class Form{
                 break;
             }
             json[id] = {
+                "parent": parent,
                 "question": question,
                 "has_attachment": hasAttachment,
                 "type": type,
