@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/output.css">
+    <link rel="stylesheet" href="../css/flowbite.css">
     <script src="../js/form.js"></script>
     <title>Document</title>
 </head>
@@ -43,12 +44,16 @@
             }
         }`
 
-        var json = JSON.parse(formConfig)
-        console.log(json)
+        // var json = JSON.parse(formConfig)
         // form.load(json);
         // form.addMainNode('id', 'question', true, 'checkbox', ['1','2','6']);
         // var node1 = new FormNode('id', 'question', true, 'checkbox', ['1','2','6']);
         // node1.addTo(form);
+
+        var question = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
+        var answerForm = new AnswerForm('container');
+        var node = new AnswerNode('test',question, true, true, 'text', [], 'pending');
+        node.addTo(answerForm);
     </script>
 </body>
 </html>
