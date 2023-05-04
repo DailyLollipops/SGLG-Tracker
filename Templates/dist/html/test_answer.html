@@ -13,23 +13,33 @@
     <div id="container" class="relative w-screen">
         <button id="button">Test</button>
         <div class="flex flex-col space-y-2 items-center justify-center">
-            <div class="flex flex-col pt-1 px-2 border-2 border-slate-300 rounded-t-lg drop-shadow-md w-2/5">
+            <div class="flex pt-1 px-2 border-2 border-slate-300 rounded-t-lg drop-shadow-md w-4/5 md:w-3/5">
                 <p class="block w-3/5 text-black text-base font-bold ml-2" for="answer">Title</p>
             </div>
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5  hover:border-l-8 hover:border-l-indigo-500">
-                <div class="flex flex-row justify-between items-between">
-                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Text</p>
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-4/5 md:w-3/5 hover:border-l-8 hover:border-l-indigo-500">
+                <div class="flex flex-row justify-between">
+                    <p class="block w-5/6 text-gray-700 text-sm font-normal ml-2 self-end" for="answer">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                     <img src="../images/verified.svg" alt="" class="h-6 self-start">
                 </div>
-                <span role="textbox" id="answer" name="answer" class="textarea text-sm grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>         
-                <div class="flex flex-col ml-2 py-2">
+                <span role="textbox" id="answer" name="answer" class="textarea text-sm font-light text-gray-700 grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>         
+                <div class="flex flex-col ml-2 pt-2">
                     <label class="block mb-2 text-sm font-medium text-gray-900 ml-1 dark:text-white" for="file_input">Upload file</label>
                     <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 ml-1 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" type="file" accept=".pdf" multiple>
                 </div>
+                <div class="files-container flex flex-wrap gap-4 ml-3">
+                    <div class="flex shrink items-center justify-center border border-slate-300 rounded-2xl p-1 hover:bg-gray-200">
+                        <span class="truncate w-32 text-sm font-light text-gray-700 px-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit</span>
+                        <img src="../images/close.png" alt="" class="h-3 mr-2">
+                    </div>
+                    <div class="flex shrink items-center justify-center border border-slate-300 rounded-2xl p-1 hover:bg-gray-200">
+                        <span class="truncate w-32 text-sm font-light text-gray-700 px-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit</span>
+                        <img src="../images/close.png" alt="" class="h-3 mr-2">
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:border-l-8 hover:border-l-indigo-500">
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-4/5 md:w-3/5 hover:border-l-8 hover:border-l-indigo-500">
                 <div class="flex flex-row justify-between items-between">
-                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Choose Date</p>
+                    <p class="block w-4/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Choose Date</p>
                     <img src="../images/verified.svg" alt="" class="h-6 self-start">
                 </div>
                 <div class="relative max-w-sm">
@@ -39,9 +49,9 @@
                     <input datepicker type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
                 </div>
             </div>
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:border-l-8 hover:border-l-indigo-500">
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-4/5 md:w-3/5 hover:border-l-8 hover:border-l-indigo-500">
                 <div class="flex flex-row justify-between items-between">
-                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Checkbox</p>
+                    <p class="block w-4/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Checkbox</p>
                     <img src="../images/verified.svg" alt="" class="h-6 self-start">
                 </div>
                 <div class="flex flex-col space-y-2 mt-2 ml-2">
@@ -55,9 +65,9 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:border-l-8 hover:border-l-indigo-500">
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-4/5 md:w-3/5 hover:border-l-8 hover:border-l-indigo-500">
                 <div class="flex flex-row justify-between items-between">
-                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Multiple Choice</p>
+                    <p class="block w-4/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Multiple Choice</p>
                     <img src="../images/verified.svg" alt="" class="h-6 self-start">
                 </div>
                 <div class="flex flex-col space-y-2 mt-2 ml-2">
