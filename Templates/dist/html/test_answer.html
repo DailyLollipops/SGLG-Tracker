@@ -5,27 +5,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/output.css">
+    <link rel="stylesheet" href="../css/flowbite.css">
     <script src="../js/form.js"></script>
     <title>Answer Sheet</title>
 </head>
 <body>
     <div id="container" class="relative w-screen">
-        <div class="flex flex-col space-y-4 items-center justify-center">
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:b-l-8 hover:b-l-indigo-500">
-                <label class="block text-gray-700 text-sm font-bold ml-2" for="answer">Text</label>
-                <span role="textbox" id="answer" name="answer" class="textarea text-sm grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>
+        <button id="button">Test</button>
+        <div class="flex flex-col space-y-2 items-center justify-center">
+            <div class="flex flex-col pt-1 px-2 border-2 border-slate-300 rounded-t-lg drop-shadow-md w-2/5">
+                <p class="block w-3/5 text-black text-base font-bold ml-2" for="answer">Title</p>
             </div>
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:b-l-8 hover:b-l-indigo-500">
-                <label class="block text-gray-700 text-sm font-bold ml-2" for="date">Date</label>
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5  hover:border-l-8 hover:border-l-indigo-500">
+                <div class="flex flex-row justify-between items-between">
+                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Text</p>
+                    <img src="../images/verified.svg" alt="" class="h-6 self-start">
+                </div>
+                <span role="textbox" id="answer" name="answer" class="textarea text-sm grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>         
+                <div class="flex flex-col ml-2 py-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 ml-1 dark:text-white" for="file_input">Upload file</label>
+                    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 ml-1 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" type="file" accept=".pdf" multiple>
+                </div>
+            </div>
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:border-l-8 hover:border-l-indigo-500">
+                <div class="flex flex-row justify-between items-between">
+                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Choose Date</p>
+                    <img src="../images/verified.svg" alt="" class="h-6 self-start">
+                </div>
                 <div class="relative max-w-sm">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                       <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
                     </div>
-                    <input datepicker type="date" id="date" name="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-2/3 pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  </div>
+                    <input datepicker type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                </div>
             </div>
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:b-l-8 hover:b-l-indigo-500">
-                <label class="block text-gray-700 text-sm font-bold ml-2" for="checkbox">Checkboxes</label>
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:border-l-8 hover:border-l-indigo-500">
+                <div class="flex flex-row justify-between items-between">
+                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Checkbox</p>
+                    <img src="../images/verified.svg" alt="" class="h-6 self-start">
+                </div>
                 <div class="flex flex-col space-y-2 mt-2 ml-2">
                     <div class="flex flex-row items-center basis-1/2">
                         <input type="checkbox" id="option-1" name="option-1" value="" class="attachment w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
@@ -37,8 +55,11 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:b-l-8 hover:b-l-indigo-500">
-                <label class="block text-gray-700 text-sm font-bold ml-2" for="choices">Multiple Choice</label>
+            <div class="flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-2 w-2/5 hover:border-l-8 hover:border-l-indigo-500">
+                <div class="flex flex-row justify-between items-between">
+                    <p class="block w-3/5 text-gray-700 text-sm font-semibold ml-2" for="answer">Multiple Choice</p>
+                    <img src="../images/verified.svg" alt="" class="h-6 self-start">
+                </div>
                 <div class="flex flex-col space-y-2 mt-2 ml-2">
                     <div class="flex items-center">
                         <input id="choice-1" type="radio" value="" name="choice" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
@@ -56,5 +77,6 @@
             </div>
         </div>
     </div>
+    <script src="../js/datepicker.min.js"></script>
 </body>
 </html>
