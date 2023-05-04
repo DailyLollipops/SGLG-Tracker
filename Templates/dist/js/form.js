@@ -38,19 +38,19 @@ class Form{
         return container;
     }
 
-    addMainNode(nodeId = '', question='', hasAttachment = false, type = 'text', options = []){
+    addMainNode(nodeId = '', question='', required = false, hasAttachment = false, type = 'text', options = []){
         if(nodeId.length == 0){
             nodeId = stringGen(8);
         }
-        var node = new FormNode(nodeId, question, hasAttachment, type, options);
+        var node = new FormNode(nodeId, question, required, hasAttachment, type, options);
         node.addTo(this);
         this.nodes[nodeId] = node;
     }
  
-    addSubNode(parentNodeId, nodeId = '', question = '', hasAttachment = false, type = 'text', options = []){
+    addSubNode(parentNodeId, nodeId = '', question = '', required = false,  hasAttachment = false, type = 'text', options = []){
         if(parentNodeId in this.nodes){
             var parentNode = this.nodes[parentNodeId]
-            var node = new FormNode(nodeId, question, hasAttachment, type, options);
+            var node = new FormNode(nodeId, question, required, hasAttachment, type, options);
             node.addTo(parentNode);
             this.nodes[nodeId] = node;
         }
@@ -67,15 +67,16 @@ class Form{
     load(json){
         for(let node in json){
             var question = json[node]['question'];
+            var required = json[node]['required'];
             var hasAttachment = json[node]['has_attachment'];
             var type = json[node]['type'];
             var options = json[node]['options'];
             if(json[node]['parent'] != this.containerId){
                 var parentNodeID = json[node]["parent"];
-                this.addSubNode(parentNodeID, node, question, hasAttachment, type, options);
+                this.addSubNode(parentNodeID, node, question, required, hasAttachment, type, options);
             }
             else{
-               this.addMainNode(node, question, hasAttachment, type, options);
+               this.addMainNode(node, question, required, hasAttachment, type, options);
             }
         }
     }
@@ -91,6 +92,7 @@ class Form{
             var id = node.getAttribute('id');
             var parent = node.getAttribute('data-parent');
             var question = node.querySelector('.indicator').innerHTML;
+            var required = node.querySelector('.required').checked;
             var hasAttachment = node.querySelector('.attachment').checked;
             var type = node.querySelector('.type').value;
             var nodeOptions = parseInt(node.getAttribute('data-options'));
@@ -110,6 +112,7 @@ class Form{
             json[id] = {
                 "parent": parent,
                 "question": question,
+                "required": required,
                 "has_attachment": hasAttachment,
                 "type": type,
                 "options": options
@@ -137,7 +140,7 @@ class FormNode {
      * @param {String} type Node type - Possible values `('text','date','list')`
      * @param {list} options Options list - Only add if type is set to `'list'`
      */
-    constructor(id, question='', hasAttachment = false, type = 'text', options = []) {
+    constructor(id, question='', required = false, hasAttachment = false, type = 'text', options = []) {
  
         // Set component id
         this.id = id;
@@ -158,8 +161,18 @@ class FormNode {
         // Create the main component
         this.element.innerHTML = '<div id="' + id +  '" class="node flex flex-row space-x-4 items-center md:justify-center" data-options="' + options.length + '" data-nodes="0" data-level="1" data-parent="">' +
                     '<div id="' + id + '-form' + '" class="form flex flex-col p-3 border-2 border-slate-300 rounded-lg drop-shadow-md space-y-4 w-5/6 md:w-1/2 hover:border-l-8 hover:border-l-indigo-500">' +
-                        '<div class="flex flex-col p-2">' +
-                            '<span role="textbox" id="' + id + '-indicator" class="indicator textarea text-sm grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1 outline-none" contenteditable></span>' + 
+                        '<div class="flex flex-row p-2 justify-between items-end">' +
+                            '<span role="textbox" id="' + id + '-indicator" class="indicator textarea w-3/5 text-sm grow-0 border-solid border-b-2 border-zinc-400 px-2 py-1 outline-none" contenteditable></span>' + 
+                            '<div class="flex mb-1">' +
+                                '<label for="' + id + '-required" class="themeSwitcherTwo relative inline-flex cursor-pointer select-none items-center">' +
+                                    '<input type="checkbox" name="' + id + '-required" id="' + id + '-required" class="required sr-only">' +
+                                    '<span class="label flex items-center text-sm font-medium text-black">Required</span>' +
+                                        '<span class="slider mx-4 flex h-4 w-12 items-center rounded-full bg-[#CCCCCE] p-1 duration-200">' +
+                                        '<span class="dot h-3 w-3 rounded-full bg-white duration-200"></span>' +
+                                    '</span>' +
+                                    '<span class="label flex items-center text-sm font-medium text-black"></span>' +
+                                '</label>' +
+                            '</div>' +
                         '</div>' +
                         '<div class="flex flex-row space-x-4">' +
                             '<div class="flex flex-row items-center basis-1/2 p-2">' +
@@ -200,6 +213,7 @@ class FormNode {
         this.node = this.element.querySelector('.node');
         this.form = this.element.querySelector('.form');
         this.questionField = this.element.querySelector('.indicator');
+        this.requiredField = this.element.querySelector('.required');
         this.hasAttachmentField = this.element.querySelector('.attachment');
         this.typeSelectorField = this.element.querySelector('.type');
         this.deleteButton = this.element.querySelector('.delete-node');
@@ -209,6 +223,7 @@ class FormNode {
         this.menu = this.element.querySelector('.node-menu');
 
         this.questionField.innerText = question;
+        this.requiredField.checked = required;
         this.hasAttachmentField.checked = hasAttachment;
         this.typeSelectorField.value = type;
         if(options.length > 0){
@@ -254,6 +269,7 @@ class FormNode {
         var data = {};
         data['parent'] = this.container.getId();
         data['question'] = this.questionField.innerHTML;
+        data['required'] = this.requiredField.checked;
         data['has_attachment'] = this.hasAttachmentField.checked;
         data['type'] = this.typeSelectorField.value;
         data['options'] = options;
@@ -296,6 +312,8 @@ class FormNode {
  
     changeNode(e){
         var optionContainer = this.element.querySelector('.options');
+        this.requiredField.disabled = false;
+        this.hasAttachmentField.disabled = false;
         if(optionContainer){
             this.form.removeChild(optionContainer);
             this.node.setAttribute('data-options', '0')
@@ -304,6 +322,12 @@ class FormNode {
         if(value == 'multiple_choice' || value == 'checkbox'){
             this.addOption(e);
             this.addOption(e);
+        }
+        else if(value == 'placeholder'){
+            this.requiredField.checked = false;
+            this.hasAttachmentField.checked = false;
+            this.requiredField.disabled = true;
+            this.hasAttachmentField.disabled = true;
         }
     }
  
