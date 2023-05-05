@@ -426,27 +426,66 @@ class FormNode {
 
 class AnswerForm{
     constructor(containerId){
+        this.containerId = containerId;
         this.element = document.getElementById(containerId);
-        this.element.classList.add('flex','flex-col','space-y-2','items-center','justify-center');
+        this.element.classList.add('flex','flex-col','space-y-2','items-center');
+        this.element.setAttribute('data-level', '0');
+        this.nodes = {};
     }
 
     get(){
         return this.element;
+    }
+
+    getLevel(){
+        return 0;
+    }
+
+    load(json){
+        console.log(json);
+        for(let node in json){
+            var parent = json[node]['parent'];
+            var question = json[node]['question'];
+            var required = json[node]['required'];
+            var hasAttachment = json[node]['has_attachment'];
+            var type = json[node]['type'];
+            var options = json[node]['options'];
+            var status = 'unanswered';
+            var answerNode = new AnswerNode(node, question, required, hasAttachment, type, options, status);
+            console.log(answerNode);
+            // if(parent != this.containerId){
+            //     console.log('test1')
+            //     answerNode.addTo(this.nodes[node]);
+            // }
+            // else{
+            //     console.log('test')
+            //     answerNode.addTo(this);
+            // }
+            this.nodes[node] = answerNode;
+        }
     }
 }
 
 class AnswerNode{
     constructor(id, question = '', required = false, hasAttachment = false, type = 'text', options = [], status = 'pending'){
         this.id = id;
+        this.required = required;
+        this.hasAttachment = hasAttachment;
+        this.type = type;
+        this.options = options;
+        this.status = status;
+        this.level = 0;
         this.container = '';
         this.element = document.createElement('div');
-        this.element.classList.add('flex','border-2','border-slate-300','rounded-t-lg','drop-shadow-md','w-4/5','md:w-3/5');
+        this.element.classList.add('flex','flex-col','space-y-2');
+        this.node = document.createElement('div');
+        this.node.classList.add('flex','border-2','border-slate-300','drop-shadow-md','w-4/5','md:w-full');
         if(type == 'placeholder'){
-            this.element.classList.add('pt-1','px-2');
-            this.element.innerHTML += `<p class="block w-3/5 text-black text-base font-bold ml-2" for="answer">${question}</p>`
+            this.node.classList.add('pt-1','px-2','rounded-t-lg');
+            this.node.innerHTML += `<p class="block w-3/5 text-black text-base font-bold ml-2" for="answer">${question}</p>`
         }
         else{
-            this.element.classList.add('flex-col','space-y-2','p-3','hover:border-l-8','hover:border-l-indigo-500');
+            this.node.classList.add('flex-col','space-y-2','p-3','rounded-lg','hover:border-l-8','hover:border-l-indigo-500');
             var statusImage = '';
             if(status == 'pending'){
                 statusImage = 'pending.svg';
@@ -454,18 +493,25 @@ class AnswerNode{
             else if(status == 'review'){
                 statusImage = 'review.svg';
             }
-            else{
+            else if(status == 'verified'){
                 statusImage = 'verified.svg';
             }
-            this.element.innerHTML = `<div class="flex flex-row justify-between">
-                    <p class="block w-4/5 text-gray-700 text-sm font-normal ml-2" for="${this.id}-answer">${question}</p>
+            if(status == 'unanswered'){
+                this.node.innerHTML = `<div class="flex flex-row justify-between">
+                    <p class="block w-4/5 text-gray-700 text-sm font-normal ml-2" for="${this.id}-answer">${question}${required ? '&nbsp;&nbsp;<span class="text-red-700">*</span>' : ''}</p>
+                </div>`
+            }
+            else{
+                this.node.innerHTML = `<div class="flex flex-row justify-between">
+                    <p class="block w-4/5 text-gray-700 text-sm font-normal ml-2" for="${this.id}-answer">${question}${required ? '&nbsp;&nbsp;<span class="text-red-700">*</span>' : ''}</p>
                     <img src="../images/${statusImage}" alt="" class="h-6 self-start">
                 </div>`
+            }
             if(type == 'text'){
-                this.element.innerHTML += `<span role="textbox" id="${this.id}-answer" name="${this.id}-answer" class="textarea w-5/6 text-sm text-gray-700 grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>`;
+                this.node.innerHTML += `<span role="textbox" id="${this.id}-answer" name="${this.id}-answer" class="textarea w-5/6 text-sm text-gray-700 grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>`;
             }
             else if(type == 'date'){
-                this.element.innerHTML += `<div class="relative max-w-sm">
+                this.node.innerHTML += `<div class="relative max-w-sm">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
                     </div>
@@ -476,13 +522,14 @@ class AnswerNode{
                 var optionContainer = document.createElement('div');
                 optionContainer.classList.add('flex','flex-col','space-y-2','mt-2','ml-2');
                 for(let i = 0; i < options.length; i++){
+                    console.log(options[i]);
                     var option = document.createElement('div');
                     option.classList.add('flex','items-center');
                     option.innerHTML = `<input id="${this.id}-answer-${i}" type="radio" value="${options[i]}" name="${this.id}-answer" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="${this.id}-answer-${i}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Yes</label>`
+                        <label for="${this.id}-answer-${i}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">${options[i]}</label>`
                     optionContainer.appendChild(option);
                 }
-                this.element.appendChild(optionContainer);
+                this.node.appendChild(optionContainer);
             }
             else if(type == 'checkbox'){
                 var optionContainer = document.createElement('div');
@@ -491,27 +538,88 @@ class AnswerNode{
                     var option = document.createElement('div');
                     option.classList.add('flex','flex-row','items-center','basis-1/2');
                     option.innerHTML = `<input type="checkbox" id="${this.id}-answer-${i}" name="${this.id}-answer-${i}" value="${options[i]}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="${this.id}-answer-${i}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Choice 1</label>`
+                        <label for="${this.id}-answer-${i}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">${options[i]}</label>`
+                        optionContainer.appendChild(option);
                 }
+                this.node.appendChild(optionContainer);
             }
             if(hasAttachment){
-                this.element.innerHTML += `<div class="flex flex-col ml-2 py-2">
+                this.node.innerHTML += `<div class="flex flex-col ml-2 py-2">
                         <label class="block mb-2 text-sm font-medium text-gray-900 ml-1 dark:text-white" for="file_input">Upload file</label>
                         <input type="file" accept=".pdf" multiple id="${this.id}-attachments" name="${this.id}-attachments" class="attachment block w-5/6 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 ml-1 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help">
                     </div>
                     <div class="files-container flex flex-wrap gap-4 ml-3">
                     </div>`
+                this.attachmentField = this.node.querySelector('.attachment');
+                this.attachmentContainer = this.node.querySelector('.files-container');
             }
         }
+        this.element.appendChild(this.node);
     }
 
     get(){
         return this.element;
     }
 
-    addTo(answerForm){
-        this.container = answerForm;
+    getLevel(){
+        return this.level;
+    }
+
+    getAnswer(){
+        if(this.type == 'placeholder'){
+            if(this.type != 'checkbox'){
+                this.answerField = this.element.querySelector('#' + this.id + '-answer');
+                console.log(this.answerField.value);
+            }
+            else{
+
+            }
+        }
+    }
+
+    addTo(parentNode){
+        console.log(parentNode);
+        this.container = parentNode;
+        this.level = this.container.getLevel()+1;
+        this.element.setAttribute('data-level', this.level);
+        this.element.classList.add('ml-6');
         this.container.get().appendChild(this.element);
+        if(this.hasAttachment){
+            this.attachmentField.addEventListener('change', this.addAttachmentLabel.bind(this));
+        }
+    }
+
+    addAttachmentLabel(e){
+        if(this.hasAttachment){
+            for(let i = 0; i < this.attachmentField.files.length; i++){
+                var attachment = document.createElement('div');
+                attachment.classList.add('flex','shrink','items-center','justify-center','border','border-slate-300','rounded-2xl','p-1','hover:bg-gray-200');
+                var attachmentName = document.createElement('span');
+                attachmentName.classList.add('truncate','w-32','text-sm','font-light','text-gray-700','px-2');
+                attachmentName.innerHTML = this.attachmentField.files[i].name;
+                // attachment.addEventListener('click', this.openFile.bind(this, e, this.attachmentField.files[i]));
+                attachment.appendChild(attachmentName);
+                var removeAttachmentButton = document.createElement('img');
+                removeAttachmentButton.src = '../images/close.png';
+                removeAttachmentButton.classList.add('h-3','mr-2','cursor-pointer');
+                removeAttachmentButton.addEventListener('click', this.removeAttachment.bind(this, e, attachment))
+                attachment.appendChild(attachmentName);
+                attachment.appendChild(removeAttachmentButton)
+                this.attachmentContainer.appendChild(attachment);
+            }
+        }
+    }
+
+    removeAttachment(e, attachment) {
+        var index = Array.from(this.attachmentContainer.children).indexOf(attachment)
+        const dataTransfer = new DataTransfer()
+        for (let i = 0; i < this.attachmentField.files.length; i++) {
+          const file = this.attachmentField.files[i];
+          if (index !== i)
+            dataTransfer.items.add(file);
+        }
+        this.attachmentField.files = dataTransfer.files;
+        this.attachmentContainer.removeChild(attachment);
     }
 }
 

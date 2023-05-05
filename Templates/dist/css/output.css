@@ -1346,6 +1346,10 @@ html{
   margin-right: 0.5rem;
 }
 
+.ml-6 {
+  margin-left: 1.5rem;
+}
+
 .block {
   display: block;
 }
@@ -1412,6 +1416,10 @@ html{
 
 .h-full {
   height: 100%;
+}
+
+.h-64 {
+  height: 16rem;
 }
 
 .w-1\/2 {
@@ -2024,6 +2032,11 @@ html{
   color: rgb(26 86 219 / var(--tw-text-opacity));
 }
 
+.text-red-700 {
+  --tw-text-opacity: 1;
+  color: rgb(200 30 30 / var(--tw-text-opacity));
+}
+
 .opacity-0 {
   opacity: 0;
 }
@@ -2623,6 +2636,10 @@ span[contenteditable]:empty::before{
 
   .md\:w-3\/5 {
     width: 60%;
+  }
+
+  .md\:w-full {
+    width: 100%;
   }
 
   .md\:basis-3\/4 {
