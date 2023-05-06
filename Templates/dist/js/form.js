@@ -458,8 +458,9 @@ class AnswerForm{
             var hasAttachment = json[node]['has_attachment'];
             var type = json[node]['type'];
             var options = json[node]['options'];
-            var status = 'unanswered';
-            var answerNode = new AnswerNode(node, question, required, hasAttachment, type, options, status);
+            var status = json[node]['status'];
+            var answer = json[node]['answer'];
+            var answerNode = new AnswerNode(node, question, required, hasAttachment, type, options, status, answer);
             if(parent != this.containerId){
                 answerNode.addTo(this, this.nodes[parent]);
             }
@@ -472,7 +473,7 @@ class AnswerForm{
 }
 
 class AnswerNode{
-    constructor(id, question = '', required = false, hasAttachment = false, type = 'text', options = [], status = 'pending'){
+    constructor(id, question = '', required = false, hasAttachment = false, type = 'text', options = [], status = 'pending', answer = ''){
         this.id = id;
         this.required = required;
         this.hasAttachment = hasAttachment;
@@ -559,6 +560,7 @@ class AnswerNode{
             }
         }
         this.element.appendChild(this.node);
+        this.setAnswer(answer);
     }
 
     get(){
@@ -598,6 +600,37 @@ class AnswerNode{
                 }
             }
             return answer;
+        }
+    }
+
+    setAnswer(answer){
+        if(this.type != 'placeholder'){
+            if(this.type  == 'text'){
+                var answerField = this.element.querySelector('.answer');
+                answerField.innerHTML = answer;
+            }
+            else if(this.type == 'date'){
+                var answerField = this.element.querySelector('.answer');
+                answerField.value = answer;
+            }
+            else if(this.type == 'checkbox'){
+                console.log(answer);
+                var options = this.element.querySelectorAll('.option')
+                for(let i = 0; i < options.length; i++){
+                    if(answer.includes(options[i].value)){;
+                        options[i].checked = true;
+                    }
+                }
+            }
+            else if(this.type == 'multiple_choice'){
+                var options = this.element.querySelectorAll('.option');
+                for(let i = 0; i < options.length; i++){
+                    if(options[i].value == answer){
+                        options[i].checked = true;
+                        break;
+                    }
+                }
+            }
         }
     }
 
