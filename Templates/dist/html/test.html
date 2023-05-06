@@ -14,16 +14,16 @@
         <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="form.addMainNode()">
     </div>
     <div class="w-8 overflow-hidden inline-block">
-        <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="form.save()">
+        <img src="../images/plus.png" alt="" class="w-4 h-4 my-auto ml-1 cursor-pointer" onclick="answerForm.save()">
     </div>
     <div id="container"></div>
+    <script src="../js/datepicker.min.js"></script>
     <script>
-
-        var form = new Form("container");
         var formConfig = `{
             "node-1" : {
                 "parent": "container",
                 "question": "How are you?",
+                "required": true,
                 "has_attachment": true,
                 "type": "text",
                 "options": []
@@ -31,29 +31,54 @@
             "node-2" : {
                 "parent": "container",
                 "question": "What are you?",
+                "required": true,
                 "has_attachment": true,
-                "type": "checkbox",
-                "options": ["Im fine","Not good","Maybe"]
+                "type": "date",
+                "options": []
             },
             "node-3" : {
                 "parent": "node-2",
+                "question": "Title 1",
+                "required": false,
+                "has_attachment": false,
+                "type": "placeholder",
+                "options": []
+            },
+            "node-4" : {
+                "parent": "node-2",
                 "question": "Where are you?",
+                "required": true,
+                "has_attachment": true,
+                "type": "multiple_choice",
+                "options": ["Im fine","Not good","Maybe"]
+            },
+            "node-5" : {
+                "parent": "node-2",
+                "question": "Where are you?",
+                "required": true,
                 "has_attachment": true,
                 "type": "checkbox",
                 "options": ["Im fine","Not good","Maybe"]
             }
         }`
 
-        // var json = JSON.parse(formConfig)
+        var json = JSON.parse(formConfig)
+        // var form = new Form('container');
         // form.load(json);
+
         // form.addMainNode('id', 'question', true, 'checkbox', ['1','2','6']);
         // var node1 = new FormNode('id', 'question', true, 'checkbox', ['1','2','6']);
         // node1.addTo(form);
 
-        var question = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
+        // var question = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
         var answerForm = new AnswerForm('container');
-        var node = new AnswerNode('test',question, true, true, 'text', [], 'pending');
-        node.addTo(answerForm);
+        // var node1 = new AnswerNode('test',question, true, true, 'text', [], 'pending');
+        // var node2 = new AnswerNode('test',question, true, true, 'text', [], 'pending');
+        // var node3 = new AnswerNode('test',question, true, true, 'text', [], 'pending');
+        // node1.addTo(answerForm, answerForm);
+        // node2.addTo(answerForm, node1);
+        // node3.addTo(answerForm, node2);
+        answerForm.load(json);
     </script>
 </body>
 </html>

@@ -441,6 +441,14 @@ class AnswerForm{
         return 0;
     }
 
+    save(){
+        var json = {};
+        for(let node in this.nodes){
+            json[node] = this.nodes[node].getData();
+        }
+        return json;
+    }
+
     load(json){
         console.log(json);
         for(let node in json){
@@ -452,15 +460,12 @@ class AnswerForm{
             var options = json[node]['options'];
             var status = 'unanswered';
             var answerNode = new AnswerNode(node, question, required, hasAttachment, type, options, status);
-            console.log(answerNode);
-            // if(parent != this.containerId){
-            //     console.log('test1')
-            //     answerNode.addTo(this.nodes[node]);
-            // }
-            // else{
-            //     console.log('test')
-            //     answerNode.addTo(this);
-            // }
+            if(parent != this.containerId){
+                answerNode.addTo(this, this.nodes[parent]);
+            }
+            else{
+                answerNode.addTo(this, this);
+            }
             this.nodes[node] = answerNode;
         }
     }
@@ -477,9 +482,9 @@ class AnswerNode{
         this.level = 0;
         this.container = '';
         this.element = document.createElement('div');
-        this.element.classList.add('flex','flex-col','space-y-2');
+        this.element.classList.add('flex','flex-col','space-y-2','w-3/5','md:4/5');
         this.node = document.createElement('div');
-        this.node.classList.add('flex','border-2','border-slate-300','drop-shadow-md','w-4/5','md:w-full');
+        this.node.classList.add('flex','border-2','border-slate-300','drop-shadow-md');
         if(type == 'placeholder'){
             this.node.classList.add('pt-1','px-2','rounded-t-lg');
             this.node.innerHTML += `<p class="block w-3/5 text-black text-base font-bold ml-2" for="answer">${question}</p>`
@@ -508,24 +513,23 @@ class AnswerNode{
                 </div>`
             }
             if(type == 'text'){
-                this.node.innerHTML += `<span role="textbox" id="${this.id}-answer" name="${this.id}-answer" class="textarea w-5/6 text-sm text-gray-700 grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>`;
+                this.node.innerHTML += `<span role="textbox" id="${this.id}-answer" name="${this.id}-answer" class="answer textarea w-5/6 text-sm text-gray-700 grow-0 border-solid border-b-2 border-zinc-400 mx-2 px-2 py-1 outline-none" contenteditable></span>`;
             }
             else if(type == 'date'){
                 this.node.innerHTML += `<div class="relative max-w-sm">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
                     </div>
-                    <input datepicker type="text" id="${this.id}-answer" name="${this.id}-answer" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                    <input datepicker type="text" id="${this.id}-answer" name="${this.id}-answer" class="answer bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
                 </div>`
             }
             else if(type == 'multiple_choice'){
                 var optionContainer = document.createElement('div');
                 optionContainer.classList.add('flex','flex-col','space-y-2','mt-2','ml-2');
                 for(let i = 0; i < options.length; i++){
-                    console.log(options[i]);
                     var option = document.createElement('div');
                     option.classList.add('flex','items-center');
-                    option.innerHTML = `<input id="${this.id}-answer-${i}" type="radio" value="${options[i]}" name="${this.id}-answer" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    option.innerHTML = `<input id="${this.id}-answer-${i}" type="radio" value="${options[i]}" name="${this.id}-answer" class="option w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         <label for="${this.id}-answer-${i}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">${options[i]}</label>`
                     optionContainer.appendChild(option);
                 }
@@ -537,7 +541,7 @@ class AnswerNode{
                 for(let i = 0; i < options.length; i++){
                     var option = document.createElement('div');
                     option.classList.add('flex','flex-row','items-center','basis-1/2');
-                    option.innerHTML = `<input type="checkbox" id="${this.id}-answer-${i}" name="${this.id}-answer-${i}" value="${options[i]}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    option.innerHTML = `<input type="checkbox" id="${this.id}-answer-${i}" name="${this.id}-answer-${i}" value="${options[i]}" class="option w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         <label for="${this.id}-answer-${i}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">${options[i]}</label>`
                         optionContainer.appendChild(option);
                 }
@@ -565,25 +569,44 @@ class AnswerNode{
         return this.level;
     }
 
-    getAnswer(){
-        if(this.type == 'placeholder'){
-            if(this.type != 'checkbox'){
-                this.answerField = this.element.querySelector('#' + this.id + '-answer');
-                console.log(this.answerField.value);
+    getData(){
+        if(this.type != 'placeholder'){
+            if(this.type  == 'text'){
+                var answerField = this.element.querySelector('.answer');
+                var answer = answerField.innerHTML;
             }
-            else{
-
+            else if(this.type == 'date'){
+                var answerField = this.element.querySelector('.answer');
+                var answer = answerField.value;
             }
+            else if(this.type == 'checkbox'){
+                var answer = [];
+                var options = this.element.querySelectorAll('.option')
+                for(let i = 0; i < options.length; i++){
+                    if(options[i].checked){
+                        answer.push(options[i].value)
+                    }
+                }
+            }
+            else if(this.type == 'multiple_choice'){
+                var options = this.element.querySelectorAll('.option');
+                for(let i = 0; i < options.length; i++){
+                    if(options[i].checked){
+                        answer = options[i].value;
+                        break;
+                    }
+                }
+            }
+            return answer;
         }
     }
 
-    addTo(parentNode){
-        console.log(parentNode);
+    addTo(answerForm, parentNode){
         this.container = parentNode;
         this.level = this.container.getLevel()+1;
         this.element.setAttribute('data-level', this.level);
-        this.element.classList.add('ml-6');
-        this.container.get().appendChild(this.element);
+        this.node.classList.add('ml-'+(this.level-1)*12);
+        answerForm.get().appendChild(this.element);
         if(this.hasAttachment){
             this.attachmentField.addEventListener('change', this.addAttachmentLabel.bind(this));
         }
