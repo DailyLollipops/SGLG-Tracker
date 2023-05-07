@@ -437,6 +437,10 @@ class AnswerForm{
         return this.element;
     }
 
+    getId(){
+        return this.containerId;
+    }
+
     getLevel(){
         return 0;
     }
@@ -446,6 +450,7 @@ class AnswerForm{
         for(let node in this.nodes){
             json[node] = this.nodes[node].getData();
         }
+        console.log(json);
         return json;
     }
 
@@ -475,6 +480,7 @@ class AnswerForm{
 class AnswerNode{
     constructor(id, question = '', required = false, hasAttachment = false, type = 'text', options = [], status = 'pending', answer = ''){
         this.id = id;
+        this.question = question;
         this.required = required;
         this.hasAttachment = hasAttachment;
         this.type = type;
@@ -567,11 +573,23 @@ class AnswerNode{
         return this.element;
     }
 
+    getId(){
+        return this.id;
+    }
+
     getLevel(){
         return this.level;
     }
 
     getData(){
+        var data = {};
+        data['parent'] = this.container.getId();
+        data['question'] = this.question;
+        data['required'] = this.required;
+        data['has_attachment'] = this.hasAttachment;
+        data['type'] = this.type;
+        data['options'] = this.options;
+        data['status'] = this.status;
         if(this.type != 'placeholder'){
             if(this.type  == 'text'){
                 var answerField = this.element.querySelector('.answer');
@@ -599,8 +617,12 @@ class AnswerNode{
                     }
                 }
             }
-            return answer;
+            data['answer'] = answer;
         }
+        else{
+            data['answer'] = '';
+        }
+        return data;
     }
 
     setAnswer(answer){
